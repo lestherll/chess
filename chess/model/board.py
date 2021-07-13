@@ -31,7 +31,7 @@ class Board:
     def __len__(self) -> int:
         return len(self.blocks)
 
-    def __getitem__(self, pos: Union[int, Block]) -> Union[Block, list[Block], IndexError]:
+    def __getitem__(self, pos: Union[int, Block]) -> Union[Block, List[Block], IndexError]:
         if isinstance(pos, Block):
             return self.blocks[pos.y][pos.x]
         return self.blocks[pos]
