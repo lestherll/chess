@@ -12,6 +12,11 @@ class MoveValidator:
         if not piece_to_move:
             return False
 
+        if (to_block.y, to_block.x) not in self.generate_move(from_block):
+            return False
+
+        return True
+
     def generate_move(self, from_block: Block) -> List[Tuple[int, int]]:
         piece_to_move: Piece = from_block.piece
 
@@ -26,25 +31,16 @@ class MoveValidator:
                 side *= -1
 
             if not piece_to_move.has_moved:
-                move_set.append((from_block.y + 1 * side, from_block.x + 1 * side))
-                move_set.append((from_block.y + 2 * side, from_block.x + 2 * side))
+                move_set.append((from_block.y + 1 * side, from_block.x))
+                move_set.append((from_block.y + 2 * side, from_block.x))
             else:
-                move_set.append((from_block.y + 1 * side, from_block.x + 1 * side))
+                move_set.append((from_block.y + 1 * side, from_block.x))
 
         elif isinstance(piece_to_move, Knight):
             for i in [-2, 2]:
                 for j in [1, -1]:
                     move_set.append((from_block.y + i, from_block.x + j))
                     move_set.append((from_block.y + j, from_block.x + i))
-
-            # move_set.append((from_block.y + 2, from_block.x + 1))
-            # move_set.append((from_block.y + 2, from_block.x - 1))
-            # move_set.append((from_block.y - 2, from_block.x + 1))
-            # move_set.append((from_block.y - 2, from_block.x - 1))
-            # move_set.append((from_block.y + 1, from_block.x + 2))
-            # move_set.append((from_block.y - 1, from_block.x + 2))
-            # move_set.append((from_block.y + 1, from_block.x - 2))
-            # move_set.append((from_block.y - 1, from_block.x - 2))
         elif isinstance(piece_to_move, Rook):
             for i in range(1, 9):
                 move_set.append((from_block.y+i, from_block.x))
