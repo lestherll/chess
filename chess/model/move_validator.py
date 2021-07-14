@@ -12,8 +12,12 @@ class MoveValidator:
         if not piece_to_move:
             return False
 
-        if (to_block.y, to_block.x) not in self.generate_move(from_block):
+        generated_moves: List[Tuple[int, int]] = self.generate_move(from_block)
+        if (to_block.y, to_block.x) not in generated_moves:
             return False
+        elif to_block.piece:
+            if from_block.piece.colour == to_block.piece.colour:
+                return False
 
         return True
 
@@ -27,7 +31,7 @@ class MoveValidator:
 
         if isinstance(piece_to_move, Pawn):
             side: Literal[1, -1] = 1
-            if piece_to_move.colour != "WHITE":
+            if piece_to_move.colour != "BLACK":
                 side *= -1
 
             if not piece_to_move.has_moved:
