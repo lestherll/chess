@@ -1,7 +1,36 @@
-from typing import List, Tuple, Literal
+from typing import List, Tuple, Literal, Optional
 
-from chess.model.board import Block
+from chess.model.board import Block, Board
 from chess.model.pieces import Piece, Pawn, Rook, Bishop, Queen, King, Knight
+
+
+def generate_move(board: Board, coord: Tuple[int, int]) -> List[Tuple[int, int]]:
+    x, y = coord
+    piece_to_move: Optional[Piece] = board[y][x].piece
+
+    if piece_to_move is None:
+        return []
+
+    move_set: List[Tuple[int, int]] = []
+
+    if isinstance(piece_to_move, Pawn):
+        side: Literal[1, -1] = 1
+        if piece_to_move.colour != "BLACK":
+            side *= -1
+
+        move_range: int = 1
+        if not piece_to_move.has_moved:
+            move_range = 2
+
+        for i in range(move_range):
+            if board[y+(i+1)*side][x].piece is None:
+                move_set.append((x, y+(i+1)*side))
+
+    return move_set
+
+
+
+
 
 
 class MoveValidator:
