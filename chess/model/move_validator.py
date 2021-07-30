@@ -9,8 +9,8 @@ BISHOP_DIRECTIONS: MoveSet = {(1, 1), (1, -1), (-1, 1), (-1, -1)}
 QUEEN_DIRECTIONS: MoveSet = ROOK_DIRECTIONS.union(BISHOP_DIRECTIONS)
 
 
-def generate_move(board: Board, coord: Coord2D) -> Union[MoveSet, NotImplementedError]:
-    x, y = coord
+def generate_move(board: Board, from_coord: Coord2D) -> Union[MoveSet, NotImplementedError]:
+    x, y = from_coord
     piece_to_move: Optional[Piece] = board[y][x].piece
 
     if piece_to_move is None:
@@ -19,13 +19,13 @@ def generate_move(board: Board, coord: Coord2D) -> Union[MoveSet, NotImplemented
     move_set: MoveSet = set()
 
     if isinstance(piece_to_move, Pawn):
-        move_set = _generate_pawn_moves(board=board, coord=coord)
+        move_set = _generate_pawn_moves(board=board, from_coord=from_coord)
 
     elif isinstance(piece_to_move, Rook):
-        move_set = _generate_rook_moves(board=board, coord=coord)
+        move_set = _generate_rook_moves(board=board, from_coord=from_coord)
 
     elif isinstance(piece_to_move, Bishop):
-        move_set = _generate_bishop_moves(board=board, coord=coord)
+        move_set = _generate_bishop_moves(board=board, from_coord=from_coord)
 
     elif isinstance(piece_to_move, Piece):
         raise NotImplementedError(f"Moves for {piece_to_move.__class__.__name__} has not been implemented")
@@ -33,14 +33,14 @@ def generate_move(board: Board, coord: Coord2D) -> Union[MoveSet, NotImplemented
     return move_set
 
 
-def out_of_bounds(coord: Coord2D, bound_range: int) -> bool:
+def out_of_bounds(from_coord: Coord2D, bound_range: int) -> bool:
     """
     Checks if any of the components of *coord* is not in 0 to *bound_range*
-    :param coord:
+    :param from_coord:
     :param bound_range:
     :return:
     """
-    x, y = coord
+    x, y = from_coord
     if x < 0 or x > bound_range - 1 or y < 0 or y > bound_range - 1:
         return True
     return False
@@ -56,7 +56,7 @@ def _generate_coord_moveset(board: Board, from_coord: Coord2D, directions: MoveS
             advancement: Coord2D = (direction[0] * i, direction[1] * i)
             curr_coord: Coord2D = (x + advancement[0], y + advancement[1])
 
-            if out_of_bounds(coord=curr_coord, bound_range=len(board)):
+            if out_of_bounds(from_coord=curr_coord, bound_range=len(board)):
                 break
 
             curr_block: Block = board[curr_coord[1]][curr_coord[0]]
@@ -71,8 +71,8 @@ def _generate_coord_moveset(board: Board, from_coord: Coord2D, directions: MoveS
     return move_set
 
 
-def _generate_pawn_moves(board: Board, coord: Coord2D) -> MoveSet:
-    x, y = coord
+def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> MoveSet:
+    x, y = from_coord
     piece_to_move: Optional[Piece] = board[y][x].piece
     move_set: MoveSet = set()
 
@@ -109,16 +109,16 @@ def _generate_pawn_moves(board: Board, coord: Coord2D) -> MoveSet:
     return move_set
 
 
-def _generate_rook_moves(board: Board, coord: Coord2D) -> MoveSet:
+def _generate_rook_moves(board: Board, from_coord: Coord2D) -> MoveSet:
     return _generate_coord_moveset(board=board,
-                                   from_coord=coord,
+                                   from_coord=from_coord,
                                    directions=ROOK_DIRECTIONS,
                                    move_range=len(board))
 
 
-def _generate_bishop_moves(board: Board, coord: Coord2D) -> MoveSet:
+def _generate_bishop_moves(board: Board, from_coord: Coord2D) -> MoveSet:
     return _generate_coord_moveset(board=board,
-                                   from_coord=coord,
+                                   from_coord=from_coord,
                                    directions=BISHOP_DIRECTIONS,
                                    move_range=len(board))
 
