@@ -27,6 +27,9 @@ def generate_move(board: Board, from_coord: Coord2D) -> Union[MoveSet, NotImplem
     elif isinstance(piece_to_move, Bishop):
         move_set = _generate_bishop_moves(board=board, from_coord=from_coord)
 
+    elif isinstance(piece_to_move, Queen):
+        move_set = _generate_queen_moves(board=board, from_coord=from_coord)
+
     elif isinstance(piece_to_move, Piece):
         raise NotImplementedError(f"Moves for {piece_to_move.__class__.__name__} has not been implemented")
 
@@ -122,6 +125,12 @@ def _generate_bishop_moves(board: Board, from_coord: Coord2D) -> MoveSet:
                                    directions=BISHOP_DIRECTIONS,
                                    move_range=len(board))
 
+
+def _generate_queen_moves(board: Board, from_coord: Coord2D) -> MoveSet:
+    return _generate_coord_moveset(board=board,
+                                   from_coord=from_coord,
+                                   directions=QUEEN_DIRECTIONS,
+                                   move_range=len(board))
 
 class MoveValidator:
 

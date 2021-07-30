@@ -4,7 +4,7 @@ from chess.custom_typehints import MoveSet
 from chess.model.game import Game
 from chess.model.board import Board
 from chess.model.move_validator import generate_move
-from chess.model.pieces import Pawn, Rook, Bishop
+from chess.model.pieces import Pawn, Rook, Bishop, Queen
 
 
 class TestMoveValidator(TestCase):
@@ -193,6 +193,19 @@ class TestMoveValidator(TestCase):
             (1, 3),
             (3, 1),
             (3, 3)
+        }
+        actual_moveset: MoveSet = generate_move(board=board, from_coord=(2, 2))
+        self.assertSetEqual(expected_moveset, actual_moveset)
+
+    def test_queen_basic_move(self):
+        board: Board = Board(_length=4)
+        board.put_piece((2, 2), Queen("WHITE"))
+
+        expected_moveset: MoveSet = {
+            (0, 2), (1, 2), (3, 2),
+            (2, 0), (2, 1), (2, 3),
+            (0, 0), (1, 1), (3, 3),
+            (1, 3), (3, 1)
         }
         actual_moveset: MoveSet = generate_move(board=board, from_coord=(2, 2))
         self.assertSetEqual(expected_moveset, actual_moveset)
