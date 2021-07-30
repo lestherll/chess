@@ -20,6 +20,9 @@ def generate_move(board: Board, coord: Tuple[int, int]) -> Union[Set[Tuple[int, 
     elif isinstance(piece_to_move, Rook):
         move_set = _generate_rook_moves(board=board, coord=coord)
 
+    elif isinstance(piece_to_move, Bishop):
+        move_set = _generate_bishop_moves(board=board, coord=coord)
+
     elif isinstance(piece_to_move, Piece):
         raise NotImplementedError(f"Moves for {piece_to_move.__class__.__name__} has not been implemented")
 
@@ -85,8 +88,8 @@ def _generate_rook_moves(board: Board, coord: Tuple[int, int]) -> MoveSet:
     # iterate through the directions a rook can take
     for direction in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
         for i in range(1, 8):
-            advancement: Tuple[int, int] = (direction[0]*i, direction[1]*i)
-            curr_coord: Tuple[int, int] = (x+advancement[0], y+advancement[1])
+            advancement: Tuple[int, int] = (direction[0] * i, direction[1] * i)
+            curr_coord: Tuple[int, int] = (x + advancement[0], y + advancement[1])
 
             if out_of_bounds(coord=curr_coord, bound_range=len(board)):
                 break
@@ -103,6 +106,32 @@ def _generate_rook_moves(board: Board, coord: Tuple[int, int]) -> MoveSet:
 
     return move_set
 
+
+def _generate_bishop_moves(board: Board, coord: Tuple[int, int]) -> MoveSet:
+    x, y = coord
+    piece_to_move: Optional[Piece] = board[y][x].piece
+    move_set: Set[Tuple[int, int]] = set()
+
+    # iterate through the directions a bishop can take
+    for direction in [(1, 1), (1, -1), (-1, 1), (-1, -1)]:
+        for i in range(1, 8):
+            advancement: Tuple[int, int] = (direction[0] * i, direction[1] * i)
+            curr_coord: Tuple[int, int] = (x + advancement[0], y + advancement[1])
+
+            if out_of_bounds(coord=curr_coord, bound_range=len(board)):
+                break
+
+            curr_block: Block = board[curr_coord[1]][curr_coord[0]]
+            if curr_block.piece is None:
+                move_set.add(curr_coord)
+            else:
+                # if piece at curr_block is different colour,
+                # add current coordinate to move_set
+                if curr_block.piece.colour != piece_to_move.colour:
+                    move_set.add(curr_coord)
+                break
+
+    return move_set
 
 
 class MoveValidator:
