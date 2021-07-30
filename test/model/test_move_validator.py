@@ -43,6 +43,12 @@ class TestMoveValidator(TestCase):
         board[4][1].piece = Pawn("BLACK")
         self.assertSetEqual({(1, 5)}, generate_move(board=board, coord=(1, 4)), msg=board)
 
+        board.clear()
+        board[6][0].piece = Pawn("BLACK")
+        self.assertSetEqual({(0, 7)}, generate_move(board=board, coord=(0, 6)), msg=board)
+        board[1][0].piece = Pawn("WHITE")
+        self.assertSetEqual({(0, 0)}, generate_move(board=board, coord=(0, 1)), msg=board)
+
     def test_pawn_take_move(self):
         board: Board = Board()
 

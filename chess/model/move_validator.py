@@ -24,7 +24,8 @@ def generate_move(board: Board, coord: Tuple[int, int]) -> Union[Set[Tuple[int, 
 
         for i in range(move_range):
             curr_y: int = y+(i+1)*side
-            if curr_y >= len(board)-1 or board[curr_y][x].piece is not None:
+            if curr_y > len(board)-1 or curr_y < 0\
+                    or board[curr_y][x].piece is not None :
                 break
             else:
                 move_set.add((x, curr_y))
