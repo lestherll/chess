@@ -1,4 +1,4 @@
-from typing import List, Tuple, Literal, Optional, Union, Set
+from typing import List, Tuple, Literal, Optional, Union, Set, Dict, Callable, Type
 
 from chess.custom_typehints import MoveSet, Coord2D
 from chess.model.board import Block, Board
@@ -7,33 +7,6 @@ from chess.model.pieces import Piece, Pawn, Rook, Bishop, Queen, King, Knight
 ROOK_DIRECTIONS: MoveSet = {(0, 1), (1, 0), (0, -1), (-1, 0)}
 BISHOP_DIRECTIONS: MoveSet = {(1, 1), (1, -1), (-1, 1), (-1, -1)}
 QUEEN_DIRECTIONS: MoveSet = ROOK_DIRECTIONS.union(BISHOP_DIRECTIONS)
-
-
-def generate_move(board: Board, from_coord: Coord2D) -> Union[MoveSet, NotImplementedError]:
-    x, y = from_coord
-    piece_to_move: Optional[Piece] = board[y][x].piece
-
-    if piece_to_move is None:
-        return set()
-
-    move_set: MoveSet = set()
-
-    if isinstance(piece_to_move, Pawn):
-        move_set = _generate_pawn_moves(board=board, from_coord=from_coord)
-
-    elif isinstance(piece_to_move, Rook):
-        move_set = _generate_rook_moves(board=board, from_coord=from_coord)
-
-    elif isinstance(piece_to_move, Bishop):
-        move_set = _generate_bishop_moves(board=board, from_coord=from_coord)
-
-    elif isinstance(piece_to_move, Queen):
-        move_set = _generate_queen_moves(board=board, from_coord=from_coord)
-
-    elif isinstance(piece_to_move, Piece):
-        raise NotImplementedError(f"Moves for {piece_to_move.__class__.__name__} has not been implemented")
-
-    return move_set
 
 
 def out_of_bounds(from_coord: Coord2D, bound_range: int) -> bool:
@@ -131,6 +104,41 @@ def _generate_queen_moves(board: Board, from_coord: Coord2D) -> MoveSet:
                                    from_coord=from_coord,
                                    directions=QUEEN_DIRECTIONS,
                                    move_range=len(board))
+
+
+piece_type_moves: Dict[Type[Piece], Callable[[Board, Coord2D], MoveSet]] = {
+    Pawn: _generate_pawn_moves,
+    Rook: _generate_rook_moves,
+    Bishop: _generate_bishop_moves,
+    Queen: _generate_queen_moves
+}
+
+
+def generate_move(board: Board, from_coord: Coord2D) -> Union[MoveSet, NotImplementedError]:
+    x, y = from_coord
+    piece_to_move: Optional[Piece] = board[y][x].piece
+
+    if piece_to_move is None:
+        return set()
+
+    move_set: MoveSet = piece_type_moves[piece_to_move.__class__](board, from_coord)
+
+    # if isinstance(piece_to_move, Pawn):
+    #     move_set = _generate_pawn_moves(board=board, from_coord=from_coord)
+    #
+    # elif isinstance(piece_to_move, Rook):
+    #     move_set = _generate_rook_moves(board=board, from_coord=from_coord)
+    #
+    # elif isinstance(piece_to_move, Bishop):
+    #     move_set = _generate_bishop_moves(board=board, from_coord=from_coord)
+    #
+    # elif isinstance(piece_to_move, Queen):
+    #     move_set = _generate_queen_moves(board=board, from_coord=from_coord)
+    #
+    # elif isinstance(piece_to_move, Piece):
+    #     raise NotImplementedError(f"Moves for {piece_to_move.__class__.__name__} has not been implemented")
+
+    return move_set
 
 class MoveValidator:
 
