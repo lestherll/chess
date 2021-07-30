@@ -1,4 +1,4 @@
-from ..types import Colour
+from ..custom_typehints import Colour
 
 
 class Piece:
