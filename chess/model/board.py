@@ -1,5 +1,6 @@
 from typing import Union, List, Any, Optional, Iterable, Tuple
 
+from chess.custom_typehints import Coord2D
 from chess.model.pieces import Piece
 
 
@@ -44,16 +45,16 @@ class Board:
 
         return "\n".join(board)
 
-    def put_piece(self, coord: Tuple[int, int], piece: Piece) -> None:
-        self[coord[1]][coord[0]].piece = piece
+    def put_piece(self, to_coord: Coord2D, piece: Piece) -> None:
+        self[to_coord[1]][to_coord[0]].piece = piece
 
-    def move_piece(self, from_block: Tuple[int, int], to_block: Tuple[int, int]) -> None:
-        piece: Optional[Piece] = self[from_block[1]][from_block[0]].piece
-        self[from_block[1]][from_block[0]].piece = None
-        self[to_block[1]][to_block[0]].piece = piece
+    def move_piece(self, from_coord: Coord2D, to_coord: Coord2D) -> None:
+        piece: Optional[Piece] = self[from_coord[1]][from_coord[0]].piece
+        self[from_coord[1]][from_coord[0]].piece = None
+        self[to_coord[1]][to_coord[0]].piece = piece
 
-    def remove_piece_at(self, from_block: Tuple[int, int]) -> None:
-        self[from_block[1]][from_block[0]].piece = None
+    def remove_piece_at(self, from_coord: Coord2D) -> None:
+        self[from_coord[1]][from_coord[0]].piece = None
 
     def clear(self) -> None:
         for row in self.blocks:

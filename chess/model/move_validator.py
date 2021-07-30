@@ -1,18 +1,18 @@
 from typing import List, Tuple, Literal, Optional, Union, Set
 
-from chess.custom_typehints import MoveSet
+from chess.custom_typehints import MoveSet, Coord2D
 from chess.model.board import Block, Board
 from chess.model.pieces import Piece, Pawn, Rook, Bishop, Queen, King, Knight
 
 
-def generate_move(board: Board, coord: Tuple[int, int]) -> Union[Set[Tuple[int, int]], NotImplementedError]:
+def generate_move(board: Board, coord: Coord2D) -> Union[MoveSet, NotImplementedError]:
     x, y = coord
     piece_to_move: Optional[Piece] = board[y][x].piece
 
     if piece_to_move is None:
         return set()
 
-    move_set: Set[Tuple[int, int]] = set()
+    move_set: MoveSet = set()
 
     if isinstance(piece_to_move, Pawn):
         move_set = _generate_pawn_moves(board=board, coord=coord)
@@ -29,7 +29,7 @@ def generate_move(board: Board, coord: Tuple[int, int]) -> Union[Set[Tuple[int, 
     return move_set
 
 
-def out_of_bounds(coord: Tuple[int, int], bound_range: int) -> bool:
+def out_of_bounds(coord: Coord2D, bound_range: int) -> bool:
     """
     Checks if any of the components of *coord* is not in 0 to *bound_range*
     :param coord:
@@ -42,10 +42,10 @@ def out_of_bounds(coord: Tuple[int, int], bound_range: int) -> bool:
     return False
 
 
-def _generate_pawn_moves(board: Board, coord: Tuple[int, int]) -> Set[Tuple[int, int]]:
+def _generate_pawn_moves(board: Board, coord: Coord2D) -> MoveSet:
     x, y = coord
     piece_to_move: Optional[Piece] = board[y][x].piece
-    move_set: Set[Tuple[int, int]] = set()
+    move_set: MoveSet = set()
 
     side: Literal[1, -1] = 1
     if piece_to_move.colour != "BLACK":
@@ -80,16 +80,16 @@ def _generate_pawn_moves(board: Board, coord: Tuple[int, int]) -> Set[Tuple[int,
     return move_set
 
 
-def _generate_rook_moves(board: Board, coord: Tuple[int, int]) -> MoveSet:
+def _generate_rook_moves(board: Board, coord: Coord2D) -> MoveSet:
     x, y = coord
     piece_to_move: Optional[Piece] = board[y][x].piece
-    move_set: Set[Tuple[int, int]] = set()
+    move_set: MoveSet = set()
 
     # iterate through the directions a rook can take
     for direction in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
         for i in range(1, 8):
-            advancement: Tuple[int, int] = (direction[0] * i, direction[1] * i)
-            curr_coord: Tuple[int, int] = (x + advancement[0], y + advancement[1])
+            advancement: Coord2D = (direction[0] * i, direction[1] * i)
+            curr_coord: Coord2D = (x + advancement[0], y + advancement[1])
 
             if out_of_bounds(coord=curr_coord, bound_range=len(board)):
                 break
@@ -107,16 +107,16 @@ def _generate_rook_moves(board: Board, coord: Tuple[int, int]) -> MoveSet:
     return move_set
 
 
-def _generate_bishop_moves(board: Board, coord: Tuple[int, int]) -> MoveSet:
+def _generate_bishop_moves(board: Board, coord: Coord2D) -> MoveSet:
     x, y = coord
     piece_to_move: Optional[Piece] = board[y][x].piece
-    move_set: Set[Tuple[int, int]] = set()
+    move_set: MoveSet = set()
 
     # iterate through the directions a bishop can take
     for direction in [(1, 1), (1, -1), (-1, 1), (-1, -1)]:
         for i in range(1, 8):
-            advancement: Tuple[int, int] = (direction[0] * i, direction[1] * i)
-            curr_coord: Tuple[int, int] = (x + advancement[0], y + advancement[1])
+            advancement: Coord2D = (direction[0] * i, direction[1] * i)
+            curr_coord: Coord2D = (x + advancement[0], y + advancement[1])
 
             if out_of_bounds(coord=curr_coord, bound_range=len(board)):
                 break
