@@ -52,8 +52,8 @@ class Board:
         self[from_block[1]][from_block[0]].piece = None
         self[to_block[1]][to_block[0]].piece = piece
 
-    def remove_piece(self, from_block: Block):
-        self[from_block].piece = None
+    def remove_piece_at(self, from_block: Tuple[int, int]) -> None:
+        self[from_block[1]][from_block[0]].piece = None
 
     def clear(self) -> None:
         for row in self.blocks:
