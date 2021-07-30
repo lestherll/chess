@@ -1,4 +1,4 @@
-from typing import Union, List, Any, Optional
+from typing import Union, List, Any, Optional, Iterable, Tuple
 
 from chess.model.pieces import Piece
 
@@ -25,8 +25,9 @@ class Block:
 
 class Board:
 
-    def __init__(self) -> None:
-        self.blocks: List[List[Block]] = [[Block(x=i, y=j) for i in range(8)] for j in range(8)]
+    def __init__(self, _length: int = 8) -> None:
+        self.blocks: List[List[Block]] = [[Block(x=i, y=j) for i in range(_length)]
+                                          for j in range(_length)]
 
     def __len__(self) -> int:
         return len(self.blocks)
@@ -36,23 +37,30 @@ class Board:
             return self.blocks[pos.y][pos.x]
         return self.blocks[pos]
 
-    def put_piece(self, block: Block, piece: Piece) -> None:
-        self[block].piece = piece
+    def __str__(self) -> str:
+        board: List = [None for i in range(8)]
+        for i, row in enumerate(self.blocks):
+            board[i] = " ".join(map(str, row))
 
-    def move_piece(self, from_block: Block, to_block: Block) -> None:
-        piece: Optional[Piece] = self[from_block].piece
-        self[from_block].piece = None
-        self[to_block].piece = piece
-        # piece: Piece = self[from_block.x][from_block.y].piece
-        # self[from_block.y][from_block.x].piece = None
-        # self[to_block.y][to_block.x].piece = piece
+        return "\n".join(board)
+
+    def put_piece(self, coord: Tuple[int, int], piece: Piece) -> None:
+        self[coord[1]][coord[0]].piece = piece
+
+    def move_piece(self, from_block: Tuple[int, int], to_block: Tuple[int, int]) -> None:
+        piece: Optional[Piece] = self[from_block[1]][from_block[0]].piece
+        self[from_block[1]][from_block[0]].piece = None
+        self[to_block[1]][to_block[0]].piece = piece
 
     def remove_piece(self, from_block: Block):
         self[from_block].piece = None
 
-    def show(self) -> None:
-        for i in self:
-            for j in i:
-                print(str(j), end=" ")
-            print()
-        print()
+    def clear(self) -> None:
+        for row in self.blocks:
+            for block in row:
+                block.piece = None
+
+
+def letter_to_coord(letter):
+    letters = {letter: i for letter, i in zip("ABCDEFGH", range(1, 9))}
+    return letters[letter[0]], int(letter[1])
