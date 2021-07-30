@@ -1,5 +1,7 @@
-from chess.model.board import Board
-from chess.model.move_validator import MoveValidator
+from typing import Tuple, Set
+
+from chess.model.board import Board, Block
+from chess.model.move_validator import MoveValidator, generate_move
 from chess.model.pieces import Pawn, Rook, Knight, Bishop, Queen, King
 
 
@@ -48,3 +50,12 @@ class Game:
         #
         # self.board[0][4].piece = King("BLACK")
         # self.board[7][4].piece = King("WHITE")
+
+    def move(self, from_coord: Tuple[int, int], to_coord: Tuple[int, int]):
+        from_block: Block = self.board[from_coord[1]][from_coord[0]]
+        to_block: Block = self.board[to_coord[1]][to_coord[0]]
+
+        move_set: Set[Tuple[int, int]] = generate_move(board=self.board, coord=from_coord)
+
+        if to_coord in move_set:
+            self.board.move_piece(from_coord, to_coord)
