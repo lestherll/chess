@@ -4,6 +4,10 @@ from chess.custom_typehints import MoveSet, Coord2D
 from chess.model.board import Block, Board
 from chess.model.pieces import Piece, Pawn, Rook, Bishop, Queen, King, Knight
 
+ROOK_DIRECTIONS: MoveSet = {(0, 1), (1, 0), (0, -1), (-1, 0)}
+BISHOP_DIRECTIONS: MoveSet = {(1, 1), (1, -1), (-1, 1), (-1, -1)}
+QUEEN_DIRECTIONS: MoveSet = ROOK_DIRECTIONS.union(BISHOP_DIRECTIONS)
+
 
 def generate_move(board: Board, coord: Coord2D) -> Union[MoveSet, NotImplementedError]:
     x, y = coord
@@ -40,6 +44,31 @@ def out_of_bounds(coord: Coord2D, bound_range: int) -> bool:
     if x < 0 or x > bound_range - 1 or y < 0 or y > bound_range - 1:
         return True
     return False
+
+
+def _generate_coord_moveset(board: Board, from_coord: Coord2D, directions: MoveSet, move_range: int) -> MoveSet:
+    x, y = from_coord
+    piece_to_move: Optional[Piece] = board[y][x].piece
+    move_set: MoveSet = set()
+
+    for direction in directions:
+        for i in range(1, move_range + 1):
+            advancement: Coord2D = (direction[0] * i, direction[1] * i)
+            curr_coord: Coord2D = (x + advancement[0], y + advancement[1])
+
+            if out_of_bounds(coord=curr_coord, bound_range=len(board)):
+                break
+
+            curr_block: Block = board[curr_coord[1]][curr_coord[0]]
+            if curr_block.piece is None:
+                move_set.add(curr_coord)
+            else:
+                # if piece at curr_block is different colour,
+                # add current coordinate to move_set
+                if curr_block.piece.colour != piece_to_move.colour:
+                    move_set.add(curr_coord)
+                break
+    return move_set
 
 
 def _generate_pawn_moves(board: Board, coord: Coord2D) -> MoveSet:
@@ -81,57 +110,17 @@ def _generate_pawn_moves(board: Board, coord: Coord2D) -> MoveSet:
 
 
 def _generate_rook_moves(board: Board, coord: Coord2D) -> MoveSet:
-    x, y = coord
-    piece_to_move: Optional[Piece] = board[y][x].piece
-    move_set: MoveSet = set()
-
-    # iterate through the directions a rook can take
-    for direction in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-        for i in range(1, 8):
-            advancement: Coord2D = (direction[0] * i, direction[1] * i)
-            curr_coord: Coord2D = (x + advancement[0], y + advancement[1])
-
-            if out_of_bounds(coord=curr_coord, bound_range=len(board)):
-                break
-
-            curr_block: Block = board[curr_coord[1]][curr_coord[0]]
-            if curr_block.piece is None:
-                move_set.add(curr_coord)
-            else:
-                # if piece at curr_block is different colour,
-                # add current coordinate to move_set
-                if curr_block.piece.colour != piece_to_move.colour:
-                    move_set.add(curr_coord)
-                break
-
-    return move_set
+    return _generate_coord_moveset(board=board,
+                                   from_coord=coord,
+                                   directions=ROOK_DIRECTIONS,
+                                   move_range=len(board))
 
 
 def _generate_bishop_moves(board: Board, coord: Coord2D) -> MoveSet:
-    x, y = coord
-    piece_to_move: Optional[Piece] = board[y][x].piece
-    move_set: MoveSet = set()
-
-    # iterate through the directions a bishop can take
-    for direction in [(1, 1), (1, -1), (-1, 1), (-1, -1)]:
-        for i in range(1, 8):
-            advancement: Coord2D = (direction[0] * i, direction[1] * i)
-            curr_coord: Coord2D = (x + advancement[0], y + advancement[1])
-
-            if out_of_bounds(coord=curr_coord, bound_range=len(board)):
-                break
-
-            curr_block: Block = board[curr_coord[1]][curr_coord[0]]
-            if curr_block.piece is None:
-                move_set.add(curr_coord)
-            else:
-                # if piece at curr_block is different colour,
-                # add current coordinate to move_set
-                if curr_block.piece.colour != piece_to_move.colour:
-                    move_set.add(curr_coord)
-                break
-
-    return move_set
+    return _generate_coord_moveset(board=board,
+                                   from_coord=coord,
+                                   directions=BISHOP_DIRECTIONS,
+                                   move_range=len(board))
 
 
 class MoveValidator:
