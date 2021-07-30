@@ -17,10 +17,27 @@ def generate_move(board: Board, coord: Tuple[int, int]) -> Union[Set[Tuple[int, 
     if isinstance(piece_to_move, Pawn):
         move_set = _generate_pawn_moves(board=board, coord=coord)
 
+    elif isinstance(piece_to_move, Rook):
+        move_set = _generate_rook_moves(board=board, coord=coord)
+
     elif isinstance(piece_to_move, Piece):
         raise NotImplementedError(f"Moves for {piece_to_move.__class__.__name__} has not been implemented")
 
     return move_set
+
+
+def out_of_bounds(coord: Tuple[int, int], bound_range: int) -> bool:
+    """
+    Checks if any of the components of *coord* is not in 0 to *bound_range*
+    :param coord:
+    :param bound_range:
+    :return:
+    """
+    x, y = coord
+    if x < 0 or x > bound_range - 1 or y < 0 or y > bound_range - 1:
+        return True
+    return False
+
 
 def _generate_pawn_moves(board: Board, coord: Tuple[int, int]) -> Set[Tuple[int, int]]:
     x, y = coord
@@ -59,8 +76,28 @@ def _generate_pawn_moves(board: Board, coord: Tuple[int, int]) -> Set[Tuple[int,
 
     return move_set
 
+
 def _generate_rook_moves(board: Board, coord: Tuple[int, int]) -> MoveSet:
-    ...
+    x, y = coord
+    piece_to_move: Optional[Piece] = board[y][x].piece
+    move_set: Set[Tuple[int, int]] = set()
+
+    for i in range(1, 8):
+        curr_coord: Tuple[int, int] = (x, y+i)
+
+        if out_of_bounds(coord=curr_coord, bound_range=len(board)):
+            break
+
+        curr_block: Block = board[y+i][x]
+        if curr_block.piece.colour != piece_to_move.colour:
+            move_set.add(curr_coord)
+            break
+        elif curr_block.piece.colour == piece_to_move.colour:
+            break
+        else:
+            move_set.add(curr_coord)
+
+    return move_set
 
 
 
@@ -107,16 +144,16 @@ class MoveValidator:
                     move_set.append((from_block.y + j, from_block.x + i))
         elif isinstance(piece_to_move, Rook):
             for i in range(1, 9):
-                move_set.append((from_block.y+i, from_block.x))
-                move_set.append((from_block.y-i, from_block.x))
-                move_set.append((from_block.y, from_block.x+i))
-                move_set.append((from_block.y, from_block.x-i))
+                move_set.append((from_block.y + i, from_block.x))
+                move_set.append((from_block.y - i, from_block.x))
+                move_set.append((from_block.y, from_block.x + i))
+                move_set.append((from_block.y, from_block.x - i))
         elif isinstance(piece_to_move, Bishop):
             for i in range(1, 9):
-                move_set.append((from_block.y+i, from_block.x+i))
-                move_set.append((from_block.y+i, from_block.x-i))
-                move_set.append((from_block.y-i, from_block.x+i))
-                move_set.append((from_block.y-i, from_block.x-i))
+                move_set.append((from_block.y + i, from_block.x + i))
+                move_set.append((from_block.y + i, from_block.x - i))
+                move_set.append((from_block.y - i, from_block.x + i))
+                move_set.append((from_block.y - i, from_block.x - i))
         elif isinstance(piece_to_move, Queen):
             for i in range(1, 9):
                 move_set.append((from_block.y + i, from_block.x))
@@ -138,5 +175,3 @@ class MoveValidator:
             move_set.append((from_block.y - 1, from_block.x - 1))
 
         return move_set
-
-

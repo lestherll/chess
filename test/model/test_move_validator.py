@@ -19,8 +19,15 @@ class TestMoveValidator(TestCase):
             self.assertSetEqual({(i, 2), (i, 3)}, generate_move(board=board, coord=(i, 1)))
             self.assertSetEqual({(i, 5), (i, 4)}, generate_move(board=board, coord=(i, 6)))
 
+        # initial moves for rooks
+        self.assertSetEqual(set(), generate_move(board=board, coord=(0, 0)))
+        self.assertSetEqual(set(), generate_move(board=board, coord=(0, 7)))
+        self.assertSetEqual(set(), generate_move(board=board, coord=(7, 0)))
+        self.assertSetEqual(set(), generate_move(board=board, coord=(7, 7)))
+
+
         # temporary test for unimplemented moves for other piece types
-        self.assertRaises(NotImplementedError, generate_move, board=board, coord=(0, 0))
+        # self.assertRaises(NotImplementedError, generate_move, board=board, coord=(0, 4))
 
     def test_pawn_blocked_at_front(self):
         board: Board = Board()
