@@ -1,17 +1,17 @@
-from typing import List, Tuple, Literal, Optional
+from typing import List, Tuple, Literal, Optional, Union, Set
 
 from chess.model.board import Block, Board
 from chess.model.pieces import Piece, Pawn, Rook, Bishop, Queen, King, Knight
 
 
-def generate_move(board: Board, coord: Tuple[int, int]) -> List[Tuple[int, int]]:
+def generate_move(board: Board, coord: Tuple[int, int]) -> Union[Set[Tuple[int, int]], NotImplementedError]:
     x, y = coord
     piece_to_move: Optional[Piece] = board[y][x].piece
 
     if piece_to_move is None:
-        return []
+        return set()
 
-    move_set: List[Tuple[int, int]] = []
+    move_set: Set[Tuple[int, int]] = set()
 
     if isinstance(piece_to_move, Pawn):
         side: Literal[1, -1] = 1
@@ -23,12 +23,34 @@ def generate_move(board: Board, coord: Tuple[int, int]) -> List[Tuple[int, int]]
             move_range = 2
 
         for i in range(move_range):
-            if board[y+(i+1)*side][x].piece is None:
-                move_set.append((x, y+(i+1)*side))
+            curr_y: int = y+(i+1)*side
+            if curr_y >= len(board)-1 or board[curr_y][x].piece is not None:
+                break
+            else:
+                move_set.add((x, curr_y))
+
+        take_range: Optional[Tuple[int, ...]] = None
+        if x <= 0:
+            take_range = (1, )
+        elif x >= 7:
+            take_range = (-1, )
+        else:
+            take_range = (-1, 1)
+
+        for take_side in take_range:
+            possible_block = board[y + 1 * side][x + take_side]
+            if possible_block.piece is not None \
+                    and possible_block.piece.colour != piece_to_move.colour:
+                move_set.add((x+take_side, y+1*side))
+
+
+    elif isinstance(piece_to_move, Piece):
+        raise NotImplementedError(f"Moves for {piece_to_move.__class__.__name__} has not been implemented")
 
     return move_set
 
-
+def _generate_pawn_moves(board: Board, coord: Tuple[int, int]) -> Set[Tuple[int, int]]:
+    ...
 
 
 
