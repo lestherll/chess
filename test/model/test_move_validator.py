@@ -1,9 +1,10 @@
 from unittest import TestCase
 
+from chess.custom_typehints import MoveSet
 from chess.model.game import Game
 from chess.model.board import Board
 from chess.model.move_validator import generate_move
-from chess.model.pieces import Pawn
+from chess.model.pieces import Pawn, Rook
 
 
 class TestMoveValidator(TestCase):
@@ -20,11 +21,16 @@ class TestMoveValidator(TestCase):
             self.assertSetEqual({(i, 5), (i, 4)}, generate_move(board=board, coord=(i, 6)))
 
         # initial moves for rooks
-        self.assertSetEqual(set(), generate_move(board=board, coord=(0, 0)))
-        self.assertSetEqual(set(), generate_move(board=board, coord=(0, 7)))
-        self.assertSetEqual(set(), generate_move(board=board, coord=(7, 0)))
-        self.assertSetEqual(set(), generate_move(board=board, coord=(7, 7)))
+        self.assertFalse(generate_move(board=board, coord=(0, 0)))
+        self.assertFalse(generate_move(board=board, coord=(0, 7)))
+        self.assertFalse(generate_move(board=board, coord=(7, 0)))
+        self.assertFalse(generate_move(board=board, coord=(7, 7)))
 
+        # initial moves for bishop
+        self.assertFalse(generate_move(board=board, coord=(2, 0)))
+        self.assertFalse(generate_move(board=board, coord=(5, 0)))
+        self.assertFalse(generate_move(board=board, coord=(2, 7)))
+        self.assertFalse(generate_move(board=board, coord=(5, 7)))
 
         # temporary test for unimplemented moves for other piece types
         # self.assertRaises(NotImplementedError, generate_move, board=board, coord=(0, 4))
@@ -91,3 +97,62 @@ class TestMoveValidator(TestCase):
         # 2 PB |    | PW
         board[2][0].piece.colour = "BLACK"
         self.assertNotIn((0, 2), generate_move(board=board, coord=(1, 1)), msg=board)
+
+    def test_rook_basic_move(self):
+        # prepare 4x4 empty board with 1 white rook at (0, 0)
+        board: Board = Board(_length=4)
+        board.put_piece((0, 0), Rook("WHITE"))
+
+        # check moveset
+        expected_moveset: MoveSet = {
+            (1, 0), (2, 0), (3, 0),
+            (0, 1), (0, 2), (0, 3)
+        }
+        actual_moveset: MoveSet = generate_move(board=board, coord=(0, 0))
+        self.assertSetEqual(expected_moveset, actual_moveset, msg=actual_moveset)
+
+    def test_rook_blocked_move_by_ally(self):
+        # prepare 4x4 empty board with 1 white rook at (0, 0)
+        board: Board = Board(_length=4)
+        board.put_piece((0, 0), Rook("WHITE"))
+        board.put_piece((1, 0), Pawn("WHITE"))
+
+        #
+        expected_moveset: MoveSet = {
+            (0, 1), (0, 2), (0, 3)
+        }
+        actual_moveset: MoveSet = generate_move(board=board, coord=(0, 0))
+        self.assertSetEqual(expected_moveset, actual_moveset, msg=actual_moveset)
+
+        board.put_piece((0, 1), Pawn("WHITE"))
+        expected_moveset = set()
+        actual_moveset = generate_move(board=board, coord=(0, 0))
+        self.assertSetEqual(expected_moveset, actual_moveset, msg=actual_moveset)
+
+        board.remove_piece_at(from_block=(1, 0))
+        expected_moveset = {
+            (1, 0), (2, 0), (3, 0)
+        }
+        actual_moveset: MoveSet = generate_move(board=board, coord=(0, 0))
+        self.assertSetEqual(expected_moveset, actual_moveset, msg=actual_moveset)
+
+    def test_rook_blocked_move_by_enemy(self):
+        board: Board = Board(_length=4)
+        board.put_piece((0, 0), Rook("WHITE"))
+        board.put_piece((1, 0), Pawn("BLACK"))  # enemy piece
+
+        # (1, 0) is the coordinate of the enemy piece
+        expected_moveset: MoveSet = {
+            (0, 1), (0, 2), (0, 3),
+            (1, 0)
+        }
+        actual_moveset: MoveSet = generate_move(board=board, coord=(0, 0))
+        self.assertSetEqual(expected_moveset, actual_moveset)
+
+        board.put_piece((0, 2), Pawn("BLACK"))
+        expected_moveset: MoveSet = {
+            (0, 1), (0, 2),
+            (1, 0)
+        }
+        actual_moveset: MoveSet = generate_move(board=board, coord=(0, 0))
+        self.assertSetEqual(expected_moveset, actual_moveset)
