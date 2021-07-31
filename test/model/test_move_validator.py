@@ -4,7 +4,7 @@ from chess.custom_typehints import MoveSet
 from chess.model.game import Game
 from chess.model.board import Board
 from chess.model.move_validator import generate_move
-from chess.model.pieces import Pawn, Rook, Bishop, Queen
+from chess.model.pieces import Pawn, Rook, Bishop, Queen, Knight
 
 
 class TestMoveValidator(TestCase):
@@ -24,6 +24,9 @@ class TestMoveValidator(TestCase):
         self.assertFalse(generate_move(board=board, from_coord=(0, 7)))
         self.assertFalse(generate_move(board=board, from_coord=(7, 0)))
         self.assertFalse(generate_move(board=board, from_coord=(7, 7)))
+
+        # initial moves for knights
+        self.assertSetEqual({(0, 2), (2, 2)}, generate_move(board=board, from_coord=(1, 0)))
 
         # initial moves for bishop
         self.assertFalse(generate_move(board=board, from_coord=(2, 0)))
@@ -209,3 +212,14 @@ class TestMoveValidator(TestCase):
         }
         actual_moveset: MoveSet = generate_move(board=board, from_coord=(2, 2))
         self.assertSetEqual(expected_moveset, actual_moveset)
+
+    def test_knight_basic_move(self):
+        board: Board = Board()
+        board.put_piece((2, 2), Knight("WHITE"))
+
+        expected_moveset: MoveSet = {
+            (0, 1), (1, 0), (3, 0), (4, 1),
+            (4, 3), (3, 4), (1, 4), (0, 3)
+        }
+        actual_moveset: MoveSet = generate_move(board=board, from_coord=(2, 2))
+        self.assertSetEqual(expected_moveset, actual_moveset, msg=actual_moveset)
