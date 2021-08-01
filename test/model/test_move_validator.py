@@ -4,7 +4,7 @@ from chess.custom_typehints import MoveSet
 from chess.model.game import Game
 from chess.model.board import Board
 from chess.model.move_validator import generate_move
-from chess.model.pieces import Pawn, Rook, Bishop, Queen, Knight
+from chess.model.pieces import Pawn, Rook, Bishop, Queen, Knight, King
 
 
 class TestMoveValidator(TestCase):
@@ -27,12 +27,23 @@ class TestMoveValidator(TestCase):
 
         # initial moves for knights
         self.assertSetEqual({(0, 2), (2, 2)}, generate_move(board=board, from_coord=(1, 0)))
+        self.assertSetEqual({(5, 2), (7, 2)}, generate_move(board=board, from_coord=(6, 0)))
+        self.assertSetEqual({(0, 5), (2, 5)}, generate_move(board=board, from_coord=(1, 7)))
+        self.assertSetEqual({(5, 5), (7, 5)}, generate_move(board=board, from_coord=(6, 7)))
 
         # initial moves for bishop
         self.assertFalse(generate_move(board=board, from_coord=(2, 0)))
         self.assertFalse(generate_move(board=board, from_coord=(5, 0)))
         self.assertFalse(generate_move(board=board, from_coord=(2, 7)))
         self.assertFalse(generate_move(board=board, from_coord=(5, 7)))
+
+        # initial moves for queens
+        self.assertFalse(generate_move(board=board, from_coord=(0, 4)))
+        self.assertFalse(generate_move(board=board, from_coord=(7, 4)))
+
+        # initial moves for kings
+        self.assertFalse(generate_move(board=board, from_coord=(0, 5)))
+        self.assertFalse(generate_move(board=board, from_coord=(7, 5)))
 
         # temporary test for unimplemented moves for other piece types
         # self.assertRaises(NotImplementedError, generate_move, board=board, coord=(0, 4))
@@ -223,3 +234,15 @@ class TestMoveValidator(TestCase):
         }
         actual_moveset: MoveSet = generate_move(board=board, from_coord=(2, 2))
         self.assertSetEqual(expected_moveset, actual_moveset, msg=actual_moveset)
+
+    def test_king_basic_move(self):
+        board: Board = Board(_length=3)
+        board.put_piece((1, 1), King("BLACK"))
+
+        expected_moveset: MoveSet = {
+            (0, 0), (1, 0), (2, 0),
+            (0, 1), (2, 1),
+            (0, 2), (1, 2), (2, 2)
+        }
+        actual_moveset: MoveSet = generate_move(board=board, from_coord=(1, 1))
+        self.assertSetEqual(expected_moveset, actual_moveset)

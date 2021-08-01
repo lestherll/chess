@@ -9,6 +9,7 @@ KNIGHT_DIRECTIONS: MoveSet = {(-2, -1), (-1, -2), (1, -2), (2, -1),
 ROOK_DIRECTIONS: MoveSet = {(0, 1), (1, 0), (0, -1), (-1, 0)}
 BISHOP_DIRECTIONS: MoveSet = {(1, 1), (1, -1), (-1, 1), (-1, -1)}
 QUEEN_DIRECTIONS: MoveSet = ROOK_DIRECTIONS.union(BISHOP_DIRECTIONS)
+KING_DIRECTIONS: MoveSet = QUEEN_DIRECTIONS
 
 
 def out_of_bounds(from_coord: Coord2D, bound_range: int) -> bool:
@@ -115,12 +116,20 @@ def _generate_queen_moves(board: Board, from_coord: Coord2D) -> MoveSet:
                                    move_range=len(board))
 
 
+def _generate_king_moves(board: Board, from_coord: Coord2D) -> MoveSet:
+    return _generate_coord_moveset(board=board,
+                                   from_coord=from_coord,
+                                   directions=KING_DIRECTIONS,
+                                   move_range=1)
+
+
 piece_type_moves: Dict[Type[Piece], Callable[[Board, Coord2D], MoveSet]] = {
     Pawn: _generate_pawn_moves,
     Rook: _generate_rook_moves,
     Knight: _generate_knight_moves,
     Bishop: _generate_bishop_moves,
-    Queen: _generate_queen_moves
+    Queen: _generate_queen_moves,
+    King: _generate_king_moves
 }
 
 
