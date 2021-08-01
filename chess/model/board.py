@@ -1,4 +1,4 @@
-from typing import Union, List, Any, Optional, Iterable, Tuple
+from typing import Union, List, Any, Optional, Iterable, Tuple, Literal
 
 from chess.custom_typehints import Coord2D
 from chess.model.pieces import Piece
@@ -10,6 +10,9 @@ class Block:
         self.x: int = x
         self.y: int = y
         self.piece: Optional[Piece] = piece
+
+    def colour(self) -> Union[Literal["BLACK", "WHITE"], None]:
+        return None if not self.piece else self.piece.colour
 
     def __repr__(self) -> str:
         return f"Block(x={self.x}, y={self.y}, piece={self.piece})"
