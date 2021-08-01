@@ -246,3 +246,16 @@ class TestMoveValidator(TestCase):
         }
         actual_moveset: MoveSet = generate_move(board=board, from_coord=(1, 1))
         self.assertSetEqual(expected_moveset, actual_moveset)
+
+    def test_king_possible_move_into_bishop_check(self):
+        board: Board = Board(_length=3)
+        board.put_piece((1, 1), King("BLACK"))
+        board.put_piece((1, 2), Bishop("WHITE"))
+
+        expected_moveset: MoveSet = {
+            (0, 0), (1, 0), (2, 0),
+
+            (0, 2), (1, 2), (2, 2)
+        }
+        actual_moveset: MoveSet = generate_move(board=board, from_coord=(1, 1))
+        self.assertSetEqual(expected_moveset, actual_moveset)
