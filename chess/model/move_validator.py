@@ -4,6 +4,8 @@ from chess.custom_typehints import Coord2DSet, Coord2D
 from chess.model.board import Block, Board
 from chess.model.pieces import Piece, Pawn, Rook, Bishop, Queen, King, Knight
 
+BLACK_PAWN_DIRECTIONS: Coord2DSet = {(0, 1)}
+WHITE_PAWN_DIRECTIONS: Coord2DSet = {(0, -1)}
 KNIGHT_DIRECTIONS: Coord2DSet = {(-2, -1), (-1, -2), (1, -2), (2, -1),
                                  (2, 1), (1, 2), (-1, 2), (-2, 1)}
 ROOK_DIRECTIONS: Coord2DSet = {(0, 1), (1, 0), (0, -1), (-1, 0)}
@@ -44,7 +46,7 @@ def _generate_coord_moveset(board: Board, from_coord: Coord2D, directions: Coord
             else:
                 # if piece at curr_block is different colour,
                 # add current coordinate to move_set
-                if curr_block.piece.colour != piece_to_move.colour:
+                if curr_block.piece.colour != piece_to_move.colour and type(piece_to_move) != Pawn:
                     move_set.add(curr_coord)
                 break
     return move_set
@@ -52,40 +54,64 @@ def _generate_coord_moveset(board: Board, from_coord: Coord2D, directions: Coord
 
 def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     x, y = from_coord
-    piece_to_move: Optional[Piece] = board[y][x].piece
-    move_set: Coord2DSet = set()
+    piece_to_move: Piece = board[y][x].piece
+    move_range: int = 1 if piece_to_move.has_moved else 2
 
-    side: Literal[1, -1] = 1
-    if piece_to_move.colour != "BLACK":
+    side: Literal[1, -1] = -1
+    directions: Coord2DSet = WHITE_PAWN_DIRECTIONS
+    if piece_to_move.colour == "BLACK":
+        directions = BLACK_PAWN_DIRECTIONS
         side *= -1
 
-    move_range: int = 1
-    if not piece_to_move.has_moved:
-        move_range = 2
+    move_set: Coord2DSet = set()
+    for i in (-1, 1):
+        curr_coord: Coord2D = (x + i, y + 1 * side)
+        if not out_of_bounds(curr_coord, len(board)):
+            curr_block: Block = board[curr_coord[1]][curr_coord[0]]
+            if curr_block.piece and curr_block.piece.colour != piece_to_move.colour:
+                move_set.add(curr_coord)
 
-    for i in range(move_range):
-        curr_y: int = y + (i + 1) * side
-        if curr_y > len(board) - 1 or curr_y < 0 \
-                or board[curr_y][x].piece is not None:
-            break
-        else:
-            move_set.add((x, curr_y))
+    return move_set.union(_generate_coord_moveset(board=board,
+                                                  from_coord=from_coord,
+                                                  directions=directions,
+                                                  move_range=move_range))
 
-    take_range: Optional[Tuple[int, ...]] = None
-    if x <= 0:
-        take_range = (1,)
-    elif x >= 7:
-        take_range = (-1,)
-    else:
-        take_range = (-1, 1)
-
-    for take_side in take_range:
-        possible_block = board[y + 1 * side][x + take_side]
-        if possible_block.piece is not None \
-                and possible_block.piece.colour != piece_to_move.colour:
-            move_set.add((x + take_side, y + 1 * side))
-
-    return move_set
+# def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
+#     x, y = from_coord
+#     piece_to_move: Optional[Piece] = board[y][x].piece
+#     move_set: Coord2DSet = set()
+#
+#     side: Literal[1, -1] = 1
+#     if piece_to_move.colour != "BLACK":
+#         side *= -1
+#
+#     move_range: int = 1
+#     if not piece_to_move.has_moved:
+#         move_range = 2
+#
+#     for i in range(move_range):
+#         curr_y: int = y + (i + 1) * side
+#         if curr_y > len(board) - 1 or curr_y < 0 \
+#                 or board[curr_y][x].piece is not None:
+#             break
+#         else:
+#             move_set.add((x, curr_y))
+#
+#     take_range: Optional[Tuple[int, ...]] = None
+#     if x <= 0:
+#         take_range = (1,)
+#     elif x >= 7:
+#         take_range = (-1,)
+#     else:
+#         take_range = (-1, 1)
+#
+#     for take_side in take_range:
+#         possible_block = board[y + 1 * side][x + take_side]
+#         if possible_block.piece is not None \
+#                 and possible_block.piece.colour != piece_to_move.colour:
+#             move_set.add((x + take_side, y + 1 * side))
+#
+#     return move_set
 
 
 def _generate_rook_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
