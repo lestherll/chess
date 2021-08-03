@@ -2,7 +2,7 @@ from typing import Tuple, Set
 
 from chess.custom_typehints import Coord2DSet
 from chess.model.board import Board, Block
-from chess.model.move_validator import MoveValidator, generate_move
+from chess.model.move_generator import generate_move
 from chess.model.pieces import Pawn, Rook, Knight, Bishop, Queen, King
 
 
@@ -12,7 +12,7 @@ class Game:
         if not board:
             self.board: Board = Board()
         self._setup()
-        self.move_validator: MoveValidator = MoveValidator()
+        # self.move_validator: MoveValidator = MoveValidator()
 
     def _setup(self) -> None:
         for i in range(8):

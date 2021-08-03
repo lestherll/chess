@@ -1,4 +1,5 @@
-from chess.game import Game
+from chess.model.game import Game
+from chess.model.move_generator import generate_move
 from chess.model.pieces import Piece, Pawn
 from model.board import Board, Block
 
@@ -20,11 +21,8 @@ from model.board import Board, Block
 
 # -------
 game = Game()
-game.board.show()
 board = game.board
-mv = game.move_validator
+print(board)
 board[2][0] = Block(2, 0, piece=Pawn("BLACK"))
-board.show()
-print(mv.generate_move(board[1][0]))
-print(mv.move_is_valid(board[1][0], board[2][0]))
-print(mv.move_is_valid(board[1][0], board[3][0]))
+print(board)
+print(generate_move(board=board, from_coord=(0, 1)))

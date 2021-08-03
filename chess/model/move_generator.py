@@ -76,6 +76,7 @@ def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
                                                   directions=directions,
                                                   move_range=move_range))
 
+
 # def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
 #     x, y = from_coord
 #     piece_to_move: Optional[Piece] = board[y][x].piece

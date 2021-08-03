@@ -3,7 +3,7 @@ from unittest import TestCase
 from chess.custom_typehints import Coord2DSet
 from chess.model.game import Game
 from chess.model.board import Board
-from chess.model.move_validator import generate_move
+from chess.model.move_generator import generate_move
 from chess.model.pieces import Pawn, Rook, Bishop, Queen, Knight, King
 
 
