@@ -1,15 +1,15 @@
 from typing import List, Tuple, Literal, Optional, Union, Set, Dict, Callable, Type
 
-from chess.custom_typehints import MoveSet, Coord2D
+from chess.custom_typehints import Coord2DSet, Coord2D
 from chess.model.board import Block, Board
 from chess.model.pieces import Piece, Pawn, Rook, Bishop, Queen, King, Knight
 
-KNIGHT_DIRECTIONS: MoveSet = {(-2, -1), (-1, -2), (1, -2), (2, -1),
-                              (2, 1), (1, 2), (-1, 2), (-2, 1)}
-ROOK_DIRECTIONS: MoveSet = {(0, 1), (1, 0), (0, -1), (-1, 0)}
-BISHOP_DIRECTIONS: MoveSet = {(1, 1), (1, -1), (-1, 1), (-1, -1)}
-QUEEN_DIRECTIONS: MoveSet = ROOK_DIRECTIONS.union(BISHOP_DIRECTIONS)
-KING_DIRECTIONS: MoveSet = QUEEN_DIRECTIONS
+KNIGHT_DIRECTIONS: Coord2DSet = {(-2, -1), (-1, -2), (1, -2), (2, -1),
+                                 (2, 1), (1, 2), (-1, 2), (-2, 1)}
+ROOK_DIRECTIONS: Coord2DSet = {(0, 1), (1, 0), (0, -1), (-1, 0)}
+BISHOP_DIRECTIONS: Coord2DSet = {(1, 1), (1, -1), (-1, 1), (-1, -1)}
+QUEEN_DIRECTIONS: Coord2DSet = ROOK_DIRECTIONS.union(BISHOP_DIRECTIONS)
+KING_DIRECTIONS: Coord2DSet = QUEEN_DIRECTIONS
 
 
 def out_of_bounds(from_coord: Coord2D, bound_range: int) -> bool:
@@ -25,10 +25,10 @@ def out_of_bounds(from_coord: Coord2D, bound_range: int) -> bool:
     return False
 
 
-def _generate_coord_moveset(board: Board, from_coord: Coord2D, directions: MoveSet, move_range: int) -> MoveSet:
+def _generate_coord_moveset(board: Board, from_coord: Coord2D, directions: Coord2DSet, move_range: int) -> Coord2DSet:
     x, y = from_coord
     piece_to_move: Optional[Piece] = board[y][x].piece
-    move_set: MoveSet = set()
+    move_set: Coord2DSet = set()
 
     for direction in directions:
         for i in range(1, move_range + 1):
@@ -50,10 +50,10 @@ def _generate_coord_moveset(board: Board, from_coord: Coord2D, directions: MoveS
     return move_set
 
 
-def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> MoveSet:
+def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     x, y = from_coord
     piece_to_move: Optional[Piece] = board[y][x].piece
-    move_set: MoveSet = set()
+    move_set: Coord2DSet = set()
 
     side: Literal[1, -1] = 1
     if piece_to_move.colour != "BLACK":
@@ -88,42 +88,42 @@ def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> MoveSet:
     return move_set
 
 
-def _generate_rook_moves(board: Board, from_coord: Coord2D) -> MoveSet:
+def _generate_rook_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     return _generate_coord_moveset(board=board,
                                    from_coord=from_coord,
                                    directions=ROOK_DIRECTIONS,
                                    move_range=len(board))
 
 
-def _generate_knight_moves(board: Board, from_coord: Coord2D) -> MoveSet:
+def _generate_knight_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     return _generate_coord_moveset(board=board,
                                    from_coord=from_coord,
                                    directions=KNIGHT_DIRECTIONS,
                                    move_range=1)
 
 
-def _generate_bishop_moves(board: Board, from_coord: Coord2D) -> MoveSet:
+def _generate_bishop_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     return _generate_coord_moveset(board=board,
                                    from_coord=from_coord,
                                    directions=BISHOP_DIRECTIONS,
                                    move_range=len(board))
 
 
-def _generate_queen_moves(board: Board, from_coord: Coord2D) -> MoveSet:
+def _generate_queen_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     return _generate_coord_moveset(board=board,
                                    from_coord=from_coord,
                                    directions=QUEEN_DIRECTIONS,
                                    move_range=len(board))
 
 
-def _generate_king_moves(board: Board, from_coord: Coord2D) -> MoveSet:
+def _generate_king_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     return _generate_coord_moveset(board=board,
                                    from_coord=from_coord,
                                    directions=KING_DIRECTIONS,
                                    move_range=1)
 
 
-piece_type_moves: Dict[Type[Piece], Callable[[Board, Coord2D], MoveSet]] = {
+piece_type_moves: Dict[Type[Piece], Callable[[Board, Coord2D], Coord2DSet]] = {
     Pawn: _generate_pawn_moves,
     Rook: _generate_rook_moves,
     Knight: _generate_knight_moves,
@@ -133,14 +133,14 @@ piece_type_moves: Dict[Type[Piece], Callable[[Board, Coord2D], MoveSet]] = {
 }
 
 
-def generate_move(board: Board, from_coord: Coord2D) -> Union[MoveSet, NotImplementedError]:
+def generate_move(board: Board, from_coord: Coord2D) -> Union[Coord2DSet, NotImplementedError]:
     x, y = from_coord
     piece_to_move: Optional[Piece] = board[y][x].piece
 
     if piece_to_move is None:
         return set()
 
-    move_set: MoveSet = piece_type_moves[piece_to_move.__class__](board, from_coord)
+    move_set: Coord2DSet = piece_type_moves[piece_to_move.__class__](board, from_coord)
 
     # if isinstance(piece_to_move, Pawn):
     #     move_set = _generate_pawn_moves(board=board, from_coord=from_coord)

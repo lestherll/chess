@@ -49,15 +49,15 @@ class Board:
         return "\n".join(board)
 
     def put_piece(self, to_coord: Coord2D, piece: Piece) -> None:
-        self[to_coord[1]][to_coord[0]].piece = piece
+        self.blocks[to_coord[1]][to_coord[0]].piece = piece
 
     def move_piece(self, from_coord: Coord2D, to_coord: Coord2D) -> None:
-        piece: Optional[Piece] = self[from_coord[1]][from_coord[0]].piece
-        self[from_coord[1]][from_coord[0]].piece = None
-        self[to_coord[1]][to_coord[0]].piece = piece
+        piece: Optional[Piece] = self.blocks[from_coord[1]][from_coord[0]].piece
+        self.blocks[from_coord[1]][from_coord[0]].piece = None
+        self.blocks[to_coord[1]][to_coord[0]].piece = piece
 
     def remove_piece_at(self, from_coord: Coord2D) -> None:
-        self[from_coord[1]][from_coord[0]].piece = None
+        self.blocks[from_coord[1]][from_coord[0]].piece = None
 
     def clear(self) -> None:
         for row in self.blocks:
@@ -65,6 +65,6 @@ class Board:
                 block.piece = None
 
 
-def letter_to_coord(letter):
+def letter_to_coord(letter) -> Coord2D:
     letters = {letter: i for letter, i in zip("ABCDEFGH", range(1, 9))}
     return letters[letter[0]], int(letter[1])
