@@ -1,7 +1,7 @@
 from typing import Union, List, Any, Optional, Iterable, Tuple, Literal
 
-from chess.custom_typehints import Coord2D
-from chess.model.pieces import Piece
+from chess.custom_typehints import Coord2D, Coord2DSet, Colour
+from chess.model.pieces import Piece, King
 
 
 class Block:
@@ -63,6 +63,19 @@ class Board:
         for row in self.blocks:
             for block in row:
                 block.piece = None
+
+    def get_pieces_by_colour(self, colour: Colour, exclude_type: Iterable = None) -> Coord2DSet:
+        # Needed to exclude king when generating moves for the king
+        # to avoid recursion error
+        if exclude_type is None:
+            exclude_type = []
+
+        coords: Coord2DSet = set()
+        for j, row in enumerate(self.blocks):
+            for i, block in enumerate(row):
+                if block.colour() == colour and type(block.piece) not in exclude_type:
+                    coords.add((i, j))
+        return coords
 
 
 def letter_to_coord(letter) -> Coord2D:

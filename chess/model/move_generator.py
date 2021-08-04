@@ -1,6 +1,7 @@
-from typing import List, Tuple, Literal, Optional, Union, Set, Dict, Callable, Type
+from itertools import chain
+from typing import List, Tuple, Literal, Optional, Union, Set, Dict, Callable, Type, Iterable
 
-from chess.custom_typehints import Coord2DSet, Coord2D
+from chess.custom_typehints import Coord2DSet, Coord2D, Colour
 from chess.model.board import Block, Board
 from chess.model.pieces import Piece, Pawn, Rook, Bishop, Queen, King, Knight
 
@@ -144,10 +145,12 @@ def _generate_queen_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
 
 
 def _generate_king_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
+    enemy_colour: Colour = "WHITE" if board[from_coord[1]][from_coord[0]].colour() == "BLACK" else "BLACK"
     return _generate_coord_moveset(board=board,
                                    from_coord=from_coord,
                                    directions=KING_DIRECTIONS,
-                                   move_range=1)
+                                   move_range=1)\
+        .difference(get_attack_coords(board=board, colour=enemy_colour, exclude_type=King))
 
 
 piece_type_moves: Dict[Type[Piece], Callable[[Board, Coord2D], Coord2DSet]] = {
@@ -185,6 +188,20 @@ def generate_move(board: Board, from_coord: Coord2D) -> Union[Coord2DSet, NotImp
     #     raise NotImplementedError(f"Moves for {piece_to_move.__class__.__name__} has not been implemented")
 
     return move_set
+
+
+def get_attack_coords(board: Board, colour: Colour, exclude_type: Iterable = None) -> Coord2DSet:
+    if exclude_type is None:
+        exclude_type = []
+
+    if not isinstance(exclude_type, Iterable):
+        exclude_type = [exclude_type]
+
+    move_set: List[Coord2DSet] = []
+    for i, j in board.get_pieces_by_colour(colour, exclude_type=exclude_type):
+        move_set.append(generate_move(board=board, from_coord=(i, j)))
+
+    return set(chain(*move_set))
 
 
 class MoveValidator: ...

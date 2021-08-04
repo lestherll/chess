@@ -1,5 +1,5 @@
 from chess.model.game import Game
-from chess.model.move_generator import generate_move
+from chess.model.move_generator import generate_move, get_attack_coords
 from chess.model.pieces import Piece, Pawn
 from model.board import Board, Block
 
@@ -26,3 +26,5 @@ print(board)
 board[2][0] = Block(2, 0, piece=Pawn("BLACK"))
 print(board)
 print(generate_move(board=board, from_coord=(0, 1)))
+
+print(get_attack_coords(board=board, colour="BLACK"))
