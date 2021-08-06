@@ -259,3 +259,29 @@ class TestMoveValidator(TestCase):
         }
         actual_moveset: Coord2DSet = generate_move(board=board, from_coord=(1, 1))
         self.assertSetEqual(expected_moveset, actual_moveset)
+
+    def test_black_king_possible_move_into_pawn_check(self):
+        board: Board = Board(_length=3)
+        board.put_piece((1, 1), King("BLACK"))
+        board.put_piece((1, 2), Pawn("WHITE"))
+
+        expected_moveset: Coord2DSet = {
+            (0, 0), (1, 0), (2, 0),
+
+            (0, 2), (1, 2), (2, 2)
+        }
+        actual_moveset: Coord2DSet = generate_move(board=board, from_coord=(1, 1))
+        self.assertSetEqual(expected_moveset, actual_moveset)
+
+    def test_white_king_possible_move_into_pawn_check(self):
+        board: Board = Board(_length=3)
+        board.put_piece((1, 1), King("WHITE"))
+        board.put_piece((1, 0), Pawn("BLACK"))
+
+        expected_moveset: Coord2DSet = {
+            (0, 0), (1, 0), (2, 0),
+
+            (0, 2), (1, 2), (2, 2)
+        }
+        actual_moveset: Coord2DSet = generate_move(board=board, from_coord=(1, 1))
+        self.assertSetEqual(expected_moveset, actual_moveset)

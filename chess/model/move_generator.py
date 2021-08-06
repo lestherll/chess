@@ -6,7 +6,10 @@ from chess.model.board import Block, Board
 from chess.model.pieces import Piece, Pawn, Rook, Bishop, Queen, King, Knight
 
 BLACK_PAWN_DIRECTIONS: Coord2DSet = {(0, 1)}
+BLACK_PAWN_ATTACK_DIRECTIONS: Coord2DSet = {(-1, 1), (1, 1)}
 WHITE_PAWN_DIRECTIONS: Coord2DSet = {(0, -1)}
+WHITE_PAWN_ATTACK_DIRECTIONS: Coord2DSet = {(-1, -1), (1, -1)}
+
 KNIGHT_DIRECTIONS: Coord2DSet = {(-2, -1), (-1, -2), (1, -2), (2, -1),
                                  (2, 1), (1, 2), (-1, 2), (-2, 1)}
 ROOK_DIRECTIONS: Coord2DSet = {(0, 1), (1, 0), (0, -1), (-1, 0)}
@@ -78,44 +81,6 @@ def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
                                                   move_range=move_range))
 
 
-# def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
-#     x, y = from_coord
-#     piece_to_move: Optional[Piece] = board[y][x].piece
-#     move_set: Coord2DSet = set()
-#
-#     side: Literal[1, -1] = 1
-#     if piece_to_move.colour != "BLACK":
-#         side *= -1
-#
-#     move_range: int = 1
-#     if not piece_to_move.has_moved:
-#         move_range = 2
-#
-#     for i in range(move_range):
-#         curr_y: int = y + (i + 1) * side
-#         if curr_y > len(board) - 1 or curr_y < 0 \
-#                 or board[curr_y][x].piece is not None:
-#             break
-#         else:
-#             move_set.add((x, curr_y))
-#
-#     take_range: Optional[Tuple[int, ...]] = None
-#     if x <= 0:
-#         take_range = (1,)
-#     elif x >= 7:
-#         take_range = (-1,)
-#     else:
-#         take_range = (-1, 1)
-#
-#     for take_side in take_range:
-#         possible_block = board[y + 1 * side][x + take_side]
-#         if possible_block.piece is not None \
-#                 and possible_block.piece.colour != piece_to_move.colour:
-#             move_set.add((x + take_side, y + 1 * side))
-#
-#     return move_set
-
-
 def _generate_rook_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     return _generate_coord_moveset(board=board,
                                    from_coord=from_coord,
@@ -150,7 +115,8 @@ def _generate_king_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
                                    from_coord=from_coord,
                                    directions=KING_DIRECTIONS,
                                    move_range=1)\
-        .difference(get_attack_coords(board=board, colour=enemy_colour, exclude_type=King))
+        .difference(get_attack_coords(board=board, colour=enemy_colour, exclude_type=[King]))\
+        .difference(_get_pawn_diag_attack(board=board, colour=enemy_colour))
 
 
 piece_type_moves: Dict[Type[Piece], Callable[[Board, Coord2D], Coord2DSet]] = {
@@ -172,21 +138,6 @@ def generate_move(board: Board, from_coord: Coord2D) -> Union[Coord2DSet, NotImp
 
     move_set: Coord2DSet = piece_type_moves[piece_to_move.__class__](board, from_coord)
 
-    # if isinstance(piece_to_move, Pawn):
-    #     move_set = _generate_pawn_moves(board=board, from_coord=from_coord)
-    #
-    # elif isinstance(piece_to_move, Rook):
-    #     move_set = _generate_rook_moves(board=board, from_coord=from_coord)
-    #
-    # elif isinstance(piece_to_move, Bishop):
-    #     move_set = _generate_bishop_moves(board=board, from_coord=from_coord)
-    #
-    # elif isinstance(piece_to_move, Queen):
-    #     move_set = _generate_queen_moves(board=board, from_coord=from_coord)
-    #
-    # elif isinstance(piece_to_move, Piece):
-    #     raise NotImplementedError(f"Moves for {piece_to_move.__class__.__name__} has not been implemented")
-
     return move_set
 
 
@@ -204,4 +155,13 @@ def get_attack_coords(board: Board, colour: Colour, exclude_type: Iterable = Non
     return set(chain(*move_set))
 
 
-class MoveValidator: ...
+def _get_pawn_diag_attack(board: Board, colour: Colour) -> Coord2DSet:
+    pawn_dir: Coord2DSet = BLACK_PAWN_ATTACK_DIRECTIONS if colour == "BLACK" else WHITE_PAWN_ATTACK_DIRECTIONS
+
+    move_set: List[Coord2DSet] = []
+    for i, j in board.get_pieces_by_colour(colour, exclude_type=[Rook, Knight, Bishop, Queen, King]):
+        move_set.append(_generate_coord_moveset(board=board,
+                                                from_coord=(i, j),
+                                                directions=pawn_dir,
+                                                move_range=1))
+    return set(chain(*move_set))
