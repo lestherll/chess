@@ -5,17 +5,7 @@ from chess.custom_typehints import Coord2DSet, Coord2D, Colour
 from chess.model.board import Block, Board
 from chess.model.pieces import Piece, Pawn, Rook, Bishop, Queen, King, Knight
 
-BLACK_PAWN_DIRECTIONS: Coord2DSet = {(0, 1)}
-BLACK_PAWN_ATTACK_DIRECTIONS: Coord2DSet = {(-1, 1), (1, 1)}
-WHITE_PAWN_DIRECTIONS: Coord2DSet = {(0, -1)}
-WHITE_PAWN_ATTACK_DIRECTIONS: Coord2DSet = {(-1, -1), (1, -1)}
-
-KNIGHT_DIRECTIONS: Coord2DSet = {(-2, -1), (-1, -2), (1, -2), (2, -1),
-                                 (2, 1), (1, 2), (-1, 2), (-2, 1)}
-ROOK_DIRECTIONS: Coord2DSet = {(0, 1), (1, 0), (0, -1), (-1, 0)}
-BISHOP_DIRECTIONS: Coord2DSet = {(1, 1), (1, -1), (-1, 1), (-1, -1)}
-QUEEN_DIRECTIONS: Coord2DSet = ROOK_DIRECTIONS.union(BISHOP_DIRECTIONS)
-KING_DIRECTIONS: Coord2DSet = QUEEN_DIRECTIONS
+from chess. constants import *
 
 
 def out_of_bounds(from_coord: Coord2D, bound_range: int) -> bool:
@@ -110,12 +100,13 @@ def _generate_queen_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
 
 
 def _generate_king_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
-    enemy_colour: Colour = "WHITE" if board[from_coord[1]][from_coord[0]].colour() == "BLACK" else "BLACK"
+    x, y = from_coord
+    enemy_colour: Colour = "WHITE" if board[y][x].colour() == "BLACK" else "BLACK"
     return _generate_coord_moveset(board=board,
                                    from_coord=from_coord,
                                    directions=KING_DIRECTIONS,
                                    move_range=1)\
-        .difference(get_attack_coords(board=board, colour=enemy_colour, exclude_type=[King]))\
+        .difference(get_attack_coords(board=board, colour=enemy_colour, exclude_type=King))\
         .difference(_get_pawn_diag_attack(board=board, colour=enemy_colour))
 
 
@@ -129,7 +120,7 @@ piece_type_moves: Dict[Type[Piece], Callable[[Board, Coord2D], Coord2DSet]] = {
 }
 
 
-def generate_move(board: Board, from_coord: Coord2D) -> Union[Coord2DSet, NotImplementedError]:
+def generate_move(board: Board, from_coord: Coord2D) -> Coord2DSet:
     x, y = from_coord
     piece_to_move: Optional[Piece] = board[y][x].piece
 
@@ -141,7 +132,9 @@ def generate_move(board: Board, from_coord: Coord2D) -> Union[Coord2DSet, NotImp
     return move_set
 
 
-def get_attack_coords(board: Board, colour: Colour, exclude_type: Iterable = None) -> Coord2DSet:
+def get_attack_coords(board: Board, colour: Colour,
+                      exclude_type: Union[Iterable[Piece], Type[Piece]] = None
+                      ) -> Coord2DSet:
     if exclude_type is None:
         exclude_type = []
 

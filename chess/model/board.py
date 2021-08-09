@@ -1,30 +1,30 @@
+from dataclasses import dataclass
 from typing import Union, List, Any, Optional, Iterable, Tuple, Literal
 
 from chess.custom_typehints import Coord2D, Coord2DSet, Colour
 from chess.model.pieces import Piece, King
 
 
+@dataclass
 class Block:
+    x: int
+    y: int
+    piece: Optional[Piece] = None
 
-    def __init__(self, x: int, y: int, piece: Optional[Piece] = None) -> None:
-        self.x: int = x
-        self.y: int = y
-        self.piece: Optional[Piece] = piece
-
-    def colour(self) -> Union[Literal["BLACK", "WHITE"], None]:
+    def colour(self) -> Optional[Literal["BLACK", "WHITE"]]:
         return None if not self.piece else self.piece.colour
 
-    def __repr__(self) -> str:
-        return f"Block(x={self.x}, y={self.y}, piece={self.piece})"
+    # def __repr__(self) -> str:
+    #     return f"Block(x={self.x}, y={self.y}, piece={self.piece})"
 
     def __str__(self) -> str:
         return f"{self.piece}"
 
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, Block):
-            if other.x == self.x and other.y == self.y:
-                return True
-        return False
+    # def __eq__(self, other: Any) -> bool:
+    #     if isinstance(other, Block):
+    #         if other.x == self.x and other.y == self.y:
+    #             return True
+    #     return False
 
 
 class Board:
@@ -40,6 +40,9 @@ class Board:
         if isinstance(pos, Block):
             return self.blocks[pos.y][pos.x]
         return self.blocks[pos]
+
+    def __repr__(self) -> str:
+        return f"Board(blocks={self.blocks})"
 
     def __str__(self) -> str:
         board: List = [None for i in range(8)]
@@ -77,7 +80,13 @@ class Board:
                     coords.add((i, j))
         return coords
 
+    def reverse_pieces(self) -> None:
+        length = len(self.blocks)
+        for j in range(length//2):
+            for b0, b1 in zip(self.blocks[j], self.blocks[length-j-1]):
+                b0.piece, b1.piece = b1.piece, b0.piece
+        # print(self.blocks)
 
 def letter_to_coord(letter) -> Coord2D:
-    letters = {letter: i for letter, i in zip("ABCDEFGH", range(1, 9))}
+    letters = {letter: i for letter, i in zip("HGFEDCBA", range(1, 9))}
     return letters[letter[0]], int(letter[1])
