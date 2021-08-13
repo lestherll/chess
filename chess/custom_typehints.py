@@ -1,12 +1,11 @@
+"""
+All the custom typehints needed for the package
+"""
 from enum import Enum
 from typing import Set, Tuple
 
 
-class Colour(Enum):
-    BLACK = "BLACK"
-    WHITE = "WHITE"
-
-
+Colour = Enum("Colour", ["BLACK", "WHITE"])
 Coord2D = Tuple[int, int]
 Coord2DSet = Set[Coord2D]
 

@@ -7,6 +7,9 @@ from chess.model.pieces import Piece, King
 
 @dataclass
 class Block:
+    """
+    A block inside a chess board
+    """
     x: int
     y: int
     piece: Optional[Piece] = None
@@ -21,6 +24,11 @@ class Block:
 class Board:
 
     def __init__(self, _length: int = 8) -> None:
+        """
+        A standard chess board that consists of 8x8 blocks by default
+        :param _length: (8 by default) depicts the dimension of the board
+        in a _length by _length manner
+        """
         self.blocks: List[List[Block]] = [[Block(x=i, y=j) for i in range(_length)]
                                           for j in range(_length)]
 
@@ -43,24 +51,51 @@ class Board:
         return "\n".join(board)
 
     def put_piece(self, to_coord: Coord2D, piece: Piece) -> None:
+        """
+        Places a piece to the given 2D coordinate (x, y)
+        :param to_coord: (x, y) coordinate of where to put the given piece
+        :param piece: piece to be put on the board on to_coord
+        :return: None
+        """
         self.blocks[to_coord[1]][to_coord[0]].piece = piece
 
     def move_piece(self, from_coord: Coord2D, to_coord: Coord2D) -> None:
+        """
+        Move a piece from_coord to to_coord on the board. Both 2D coordinates are ordered x,y
+        :param from_coord: origin of the piece to be moved
+        :param to_coord: destination of the piece to be moved
+        :return: None
+        """
         piece: Optional[Piece] = self.blocks[from_coord[1]][from_coord[0]].piece
         self.blocks[from_coord[1]][from_coord[0]].piece = None
         self.blocks[to_coord[1]][to_coord[0]].piece = piece
 
     def remove_piece_at(self, from_coord: Coord2D) -> None:
+        """
+        Removes a piece at given coordinate
+        :param from_coord: origin of the piece to be removed
+        :return: None
+        """
         self.blocks[from_coord[1]][from_coord[0]].piece = None
 
     def clear(self) -> None:
+        """
+        Clears the board blocks of pieces, sets it to None
+        :return: None
+        """
         for row in self.blocks:
             for block in row:
                 block.piece = None
 
     def get_pieces_by_colour(self, colour: Colour, exclude_type: Iterable = None) -> Coord2DSet:
-        # Needed to exclude king when generating moves for the king
-        # to avoid recursion error
+        """
+        Get all pieces that are on the board by colour
+        :param colour: the colour of pieces needed
+        :param exclude_type: excluded type pieces
+        :return: set of 2D tuples that contain all the pieces wanted by colour
+        """
+        # Needed to exclude king when generating
+        # moves for the king to avoid recursion error
         if exclude_type is None:
             exclude_type = []
 
@@ -72,11 +107,16 @@ class Board:
         return coords
 
     def reverse_pieces(self) -> None:
+        """
+        Reverses the board
+        :return: None
+        """
         length = len(self.blocks)
         for j in range(length//2):
             for b0, b1 in zip(self.blocks[j], self.blocks[length-j-1]):
                 b0.piece, b1.piece = b1.piece, b0.piece
         # print(self.blocks)
+
 
 def letter_to_coord(letter) -> Coord2D:
     letters = {letter: i for letter, i in zip("HGFEDCBA", range(1, 9))}
