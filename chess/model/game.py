@@ -16,26 +16,22 @@ class Game:
 
     def _setup(self) -> None:
         for i in range(8):
-            self.board[1][i].piece = Pawn("BLACK")
-            self.board[6][i].piece = Pawn("WHITE")
+            self.board.put_piece((i, 1), Pawn("BLACK"))
+            self.board.put_piece((i, 6), Pawn("WHITE"))
 
         for i, piece in enumerate([Rook, Knight, Bishop]):
-            self.board[0][i].piece = piece("BLACK")
-            self.board[0][7 - i].piece = piece("BLACK")
-            self.board[7][i].piece = piece("WHITE")
-            self.board[7][7 - i].piece = piece("WHITE")
+            self.board.put_piece((i, 0), piece("BLACK"))
+            self.board.put_piece((7-i, 0), piece("BLACK"))
+            self.board.put_piece((i, 7), piece("WHITE"))
+            self.board.put_piece((7-i, 7), piece("WHITE"))
 
-        self.board[0][3].piece = Queen("BLACK")
-        self.board[7][3].piece = Queen("WHITE")
+        self.board.put_piece((3, 0), Queen("BLACK"))
+        self.board.put_piece((3, 7), Queen("WHITE"))
 
-        self.board[0][4].piece = King("BLACK")
-        self.board[7][4].piece = King("WHITE")
+        self.board.put_piece((4, 0), King("BLACK"))
+        self.board.put_piece((4, 7), King("WHITE"))
 
     def move(self, from_coord: Tuple[int, int], to_coord: Tuple[int, int]) -> None:
-        from_block: Block = self.board[from_coord[1]][from_coord[0]]
-        to_block: Block = self.board[to_coord[1]][to_coord[0]]
-
         move_set: Coord2DSet = generate_move(board=self.board, from_coord=from_coord)
-
         if to_coord in move_set:
             self.board.move_piece(from_coord, to_coord)

@@ -14,17 +14,8 @@ class Block:
     def colour(self) -> Optional[Literal["BLACK", "WHITE"]]:
         return None if not self.piece else self.piece.colour
 
-    # def __repr__(self) -> str:
-    #     return f"Block(x={self.x}, y={self.y}, piece={self.piece})"
-
     def __str__(self) -> str:
         return f"{self.piece}"
-
-    # def __eq__(self, other: Any) -> bool:
-    #     if isinstance(other, Block):
-    #         if other.x == self.x and other.y == self.y:
-    #             return True
-    #     return False
 
 
 class Board:
