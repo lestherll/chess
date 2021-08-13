@@ -1,5 +1,12 @@
-from typing import Literal, Set, Tuple
+from enum import Enum
+from typing import Set, Tuple
 
-Colour = Literal["BLACK", "WHITE"]
+
+class Colour(Enum):
+    BLACK = "BLACK"
+    WHITE = "WHITE"
+
+
 Coord2D = Tuple[int, int]
 Coord2DSet = Set[Coord2D]
+

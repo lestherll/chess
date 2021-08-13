@@ -53,7 +53,7 @@ def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
 
     side: Literal[1, -1] = -1
     directions: Coord2DSet = WHITE_PAWN_DIRECTIONS
-    if piece_to_move.colour == "BLACK":
+    if piece_to_move.colour == Colour.BLACK:
         directions = BLACK_PAWN_DIRECTIONS
         side *= -1
 
@@ -101,7 +101,7 @@ def _generate_queen_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
 
 def _generate_king_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     x, y = from_coord
-    enemy_colour: Colour = "WHITE" if board[y][x].colour() == "BLACK" else "BLACK"
+    enemy_colour: Colour = Colour.WHITE if board[y][x].colour() == Colour.BLACK else Colour.BLACK
     return _generate_coord_moveset(board=board,
                                    from_coord=from_coord,
                                    directions=KING_DIRECTIONS,
@@ -121,6 +121,7 @@ piece_type_moves: Dict[Type[Piece], Callable[[Board, Coord2D], Coord2DSet]] = {
 
 
 def generate_move(board: Board, from_coord: Coord2D) -> Coord2DSet:
+    """Generate moveset(of Coord2DSet annotation) for a piece on the board"""
     x, y = from_coord
     piece_to_move: Optional[Piece] = board[y][x].piece
 
@@ -149,7 +150,8 @@ def get_attack_coords(board: Board, colour: Colour,
 
 
 def _get_pawn_diag_attack(board: Board, colour: Colour) -> Coord2DSet:
-    pawn_dir: Coord2DSet = BLACK_PAWN_ATTACK_DIRECTIONS if colour == "BLACK" else WHITE_PAWN_ATTACK_DIRECTIONS
+    """Helper function for """
+    pawn_dir: Coord2DSet = BLACK_PAWN_ATTACK_DIRECTIONS if colour == Colour.BLACK else WHITE_PAWN_ATTACK_DIRECTIONS
 
     move_set: List[Coord2DSet] = []
     for i, j in board.get_pieces_by_colour(colour, exclude_type=[Rook, Knight, Bishop, Queen, King]):

@@ -11,7 +11,7 @@ class Block:
     y: int
     piece: Optional[Piece] = None
 
-    def colour(self) -> Optional[Literal["BLACK", "WHITE"]]:
+    def colour(self) -> Optional[Colour]:
         return None if not self.piece else self.piece.colour
 
     def __str__(self) -> str:

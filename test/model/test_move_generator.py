@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from chess.custom_typehints import Coord2DSet
+from chess.custom_typehints import Coord2DSet, Colour
 from chess.model.game import Game
 from chess.model.board import Board
 from chess.model.move_generator import generate_move
@@ -50,29 +50,29 @@ class TestMoveValidator(TestCase):
 
     def test_pawn_blocked_at_front(self):
         board: Board = Board()
-        board.put_piece((1, 0), Pawn("BLACK"))
-        board.put_piece((0, 2), Pawn("WHITE"))
+        board.put_piece((1, 0), Pawn(Colour.WHITE))
+        board.put_piece((0, 2), Pawn(Colour.WHITE))
         self.assertSetEqual(set(), generate_move(board=board, from_coord=(0, 1)))
 
         board.clear()
-        board.put_piece((1, 1), Pawn("BLACK"))
-        board.put_piece((1, 3), Pawn("WHITE"))
+        board.put_piece((1, 1), Pawn(Colour.BLACK))
+        board.put_piece((1, 3), Pawn(Colour.WHITE))
         self.assertSetEqual({(1, 2)}, generate_move(board=board, from_coord=(1, 1)))
 
         board.clear()
-        board.put_piece((0, 6), Pawn("WHITE"))
-        board.put_piece((0, 5), Pawn("BLACK"))
+        board.put_piece((0, 6), Pawn(Colour.WHITE))
+        board.put_piece((0, 5), Pawn(Colour.BLACK))
         self.assertSetEqual(set(), generate_move(board=board, from_coord=(0, 6)))
 
         board.clear()
-        board.put_piece((1, 6), Pawn("WHITE"))
-        board.put_piece((1, 4), Pawn("BLACK"))
+        board.put_piece((1, 6), Pawn(Colour.WHITE))
+        board.put_piece((1, 4), Pawn(Colour.BLACK))
         self.assertSetEqual({(1, 5)}, generate_move(board=board, from_coord=(1, 4)))
 
         board.clear()
-        board.put_piece((0, 6), Pawn("BLACK"))
+        board.put_piece((0, 6), Pawn(Colour.BLACK))
         self.assertSetEqual({(0, 7)}, generate_move(board=board, from_coord=(0, 6)))
-        board.put_piece((0, 1), Pawn("WHITE"))
+        board.put_piece((0, 1), Pawn(Colour.WHITE))
         self.assertSetEqual({(0, 0)}, generate_move(board=board, from_coord=(0, 1)))
 
     def test_pawn_take_move(self):
@@ -83,8 +83,8 @@ class TestMoveValidator(TestCase):
         # 1 PB |
         #  ----|----
         # 2    | PW
-        board.put_piece((0, 1), Pawn("BLACK", has_moved=True))
-        board.put_piece((1, 2), Pawn("WHITE"))
+        board.put_piece((0, 1), Pawn(Colour.BLACK, has_moved=True))
+        board.put_piece((1, 2), Pawn(Colour.WHITE))
         self.assertIn((1, 2), generate_move(board=board, from_coord=(0, 1)))
 
         # same setup but black pawn is in (1, 1) so can possibly
@@ -92,15 +92,15 @@ class TestMoveValidator(TestCase):
         # 1    | PB |
         #  ----|----|----
         # 2    |    | PW
-        board.put_piece((1, 1), Pawn("BLACK"))
-        board.put_piece((2, 2), Pawn("WHITE"))
+        board.put_piece((1, 1), Pawn(Colour.BLACK))
+        board.put_piece((2, 2), Pawn(Colour.WHITE))
         self.assertIn((2, 2), generate_move(board=board, from_coord=(1, 1)))
 
         # added white pawn to lower left side of black pawn at (1, 1)
         # 1    | PB |
         #  ----|----|----
         # 2 PW |    | PW
-        board.put_piece((0, 2), Pawn("WHITE"))
+        board.put_piece((0, 2), Pawn(Colour.WHITE))
         self.assertIn((0, 2), generate_move(board=board, from_coord=(1, 1)))
 
         # changed colour of pawn at (x=0, y=2) from white to black hence
@@ -108,13 +108,13 @@ class TestMoveValidator(TestCase):
         # 1    | PB |
         #  ----|----|----
         # 2 PB |    | PW
-        board[2][0].piece.colour = "BLACK"
+        board[2][0].piece.colour = Colour.BLACK
         self.assertNotIn((0, 2), generate_move(board=board, from_coord=(1, 1)), msg=board)
 
     def test_rook_basic_move(self):
         # prepare 4x4 empty board with 1 white rook at (0, 0)
         board: Board = Board(_length=4)
-        board.put_piece((0, 0), Rook("WHITE"))
+        board.put_piece((0, 0), Rook(Colour.WHITE))
 
         # check moveset
         expected_moveset: Coord2DSet = {
@@ -127,8 +127,8 @@ class TestMoveValidator(TestCase):
     def test_rook_blocked_move_by_ally(self):
         # prepare 4x4 empty board with 1 white rook at (0, 0)
         board: Board = Board(_length=4)
-        board.put_piece((0, 0), Rook("WHITE"))
-        board.put_piece((1, 0), Pawn("WHITE"))
+        board.put_piece((0, 0), Rook(Colour.WHITE))
+        board.put_piece((1, 0), Pawn(Colour.WHITE))
 
         #
         expected_moveset: Coord2DSet = {
@@ -137,7 +137,7 @@ class TestMoveValidator(TestCase):
         actual_moveset: Coord2DSet = generate_move(board=board, from_coord=(0, 0))
         self.assertSetEqual(expected_moveset, actual_moveset)
 
-        board.put_piece((0, 1), Pawn("WHITE"))
+        board.put_piece((0, 1), Pawn(Colour.WHITE))
         expected_moveset = set()
         actual_moveset = generate_move(board=board, from_coord=(0, 0))
         self.assertSetEqual(expected_moveset, actual_moveset)
@@ -151,8 +151,8 @@ class TestMoveValidator(TestCase):
 
     def test_rook_blocked_move_by_enemy(self):
         board: Board = Board(_length=4)
-        board.put_piece((0, 0), Rook("WHITE"))
-        board.put_piece((1, 0), Pawn("BLACK"))  # enemy piece
+        board.put_piece((0, 0), Rook(Colour.WHITE))
+        board.put_piece((1, 0), Pawn(Colour.BLACK))  # enemy piece
 
         # (1, 0) is the coordinate of the enemy piece
         expected_moveset: Coord2DSet = {
@@ -162,7 +162,7 @@ class TestMoveValidator(TestCase):
         actual_moveset: Coord2DSet = generate_move(board=board, from_coord=(0, 0))
         self.assertSetEqual(expected_moveset, actual_moveset)
 
-        board.put_piece((0, 2), Pawn("BLACK"))
+        board.put_piece((0, 2), Pawn(Colour.BLACK))
         expected_moveset: Coord2DSet = {
             (0, 1), (0, 2),
             (1, 0)
@@ -172,7 +172,7 @@ class TestMoveValidator(TestCase):
 
     def test_bishop_basic_move(self):
         board: Board = Board(_length=4)
-        board.put_piece((2, 2), Bishop("WHITE"))
+        board.put_piece((2, 2), Bishop(Colour.WHITE))
 
         expected_moveset: Coord2DSet = {
             (1, 1), (0, 0),
@@ -185,9 +185,9 @@ class TestMoveValidator(TestCase):
 
     def test_bishop_blocked_move_by_ally(self):
         board: Board = Board(_length=4)
-        board.put_piece((2, 2), Bishop("WHITE"))
-        board.put_piece((1, 1), Pawn("WHITE"))
-        board.put_piece((3, 3), Pawn("WHITE"))
+        board.put_piece((2, 2), Bishop(Colour.WHITE))
+        board.put_piece((1, 1), Pawn(Colour.WHITE))
+        board.put_piece((3, 3), Pawn(Colour.WHITE))
 
         expected_moveset: Coord2DSet = {
             (1, 3),
@@ -198,9 +198,9 @@ class TestMoveValidator(TestCase):
 
     def test_bishop_blocked_move_by_enemy(self):
         board: Board = Board(_length=4)
-        board.put_piece((2, 2), Bishop("WHITE"))
-        board.put_piece((1, 1), Pawn("BLACK"))
-        board.put_piece((3, 3), Pawn("BLACK"))
+        board.put_piece((2, 2), Bishop(Colour.WHITE))
+        board.put_piece((1, 1), Pawn(Colour.BLACK))
+        board.put_piece((3, 3), Pawn(Colour.BLACK))
 
         expected_moveset: Coord2DSet = {
             (1, 1),
@@ -213,7 +213,7 @@ class TestMoveValidator(TestCase):
 
     def test_queen_basic_move(self):
         board: Board = Board(_length=4)
-        board.put_piece((2, 2), Queen("WHITE"))
+        board.put_piece((2, 2), Queen(Colour.WHITE))
 
         expected_moveset: Coord2DSet = {
             (0, 2), (1, 2), (3, 2),
@@ -226,7 +226,7 @@ class TestMoveValidator(TestCase):
 
     def test_knight_basic_move(self):
         board: Board = Board()
-        board.put_piece((2, 2), Knight("WHITE"))
+        board.put_piece((2, 2), Knight(Colour.WHITE))
 
         expected_moveset: Coord2DSet = {
             (0, 1), (1, 0), (3, 0), (4, 1),
@@ -237,7 +237,7 @@ class TestMoveValidator(TestCase):
 
     def test_king_basic_move(self):
         board: Board = Board(_length=3)
-        board.put_piece((1, 1), King("BLACK"))
+        board.put_piece((1, 1), King(Colour.WHITE))
 
         expected_moveset: Coord2DSet = {
             (0, 0), (1, 0), (2, 0),
@@ -249,8 +249,8 @@ class TestMoveValidator(TestCase):
 
     def test_king_possible_move_into_bishop_check(self):
         board: Board = Board(_length=3)
-        board.put_piece((1, 1), King("BLACK"))
-        board.put_piece((1, 2), Bishop("WHITE"))
+        board.put_piece((1, 1), King(Colour.BLACK))
+        board.put_piece((1, 2), Bishop(Colour.WHITE))
 
         expected_moveset: Coord2DSet = {
             (0, 0), (1, 0), (2, 0),
@@ -262,8 +262,8 @@ class TestMoveValidator(TestCase):
 
     def test_black_king_possible_move_into_pawn_check(self):
         board: Board = Board(_length=3)
-        board.put_piece((1, 1), King("BLACK"))
-        board.put_piece((1, 2), Pawn("WHITE"))
+        board.put_piece((1, 1), King(Colour.BLACK))
+        board.put_piece((1, 2), Pawn(Colour.WHITE))
 
         expected_moveset: Coord2DSet = {
             (0, 0), (1, 0), (2, 0),
@@ -275,8 +275,8 @@ class TestMoveValidator(TestCase):
 
     def test_white_king_possible_move_into_pawn_check(self):
         board: Board = Board(_length=3)
-        board.put_piece((1, 1), King("WHITE"))
-        board.put_piece((1, 0), Pawn("BLACK"))
+        board.put_piece((1, 1), King(Colour.WHITE))
+        board.put_piece((1, 0), Pawn(Colour.BLACK))
 
         expected_moveset: Coord2DSet = {
             (0, 0), (1, 0), (2, 0),

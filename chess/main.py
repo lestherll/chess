@@ -1,3 +1,4 @@
+from chess.custom_typehints import Colour
 from chess.model.game import Game
 from chess.model.move_generator import generate_move, get_attack_coords, _get_pawn_diag_attack
 from chess.model.pieces import Piece, Pawn
@@ -8,7 +9,7 @@ from model.board import Board, Block
 # #     print(row)
 # board.show()
 #
-# board.put_piece(Block(1, 1), Piece("BLACK"))
+# board.put_piece(Block(1, 1), Piece(Colour.BLACK))
 # board.show()
 #
 # board.move_piece(Block(1, 1), Block(2, 3))
@@ -23,12 +24,12 @@ from model.board import Board, Block
 game = Game()
 board = game.board
 print(board)
-board[2][0] = Block(2, 0, piece=Pawn("BLACK"))
+board[2][0] = Block(2, 0, piece=Pawn(Colour.BLACK))
 print(board)
 print(generate_move(board=board, from_coord=(0, 1)))
 
-print(get_attack_coords(board=board, colour="BLACK"))
+print(get_attack_coords(board=board, colour=Colour.BLACK))
 
 board.clear()
-board.put_piece((2, 5), piece=Pawn("WHITE"))
-print(_get_pawn_diag_attack(board=board, colour="WHITE"))
+board.put_piece((2, 5), piece=Pawn(Colour.WHITE))
+print(_get_pawn_diag_attack(board=board, colour=Colour.WHITE))

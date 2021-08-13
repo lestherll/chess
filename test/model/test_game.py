@@ -16,3 +16,4 @@ class TestGame(TestCase):
 
         self.assertIsNone(game.board[1][0].piece)
         self.assertIsNotNone(game.board[2][0].piece)
+
