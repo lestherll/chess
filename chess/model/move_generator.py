@@ -45,7 +45,7 @@ def _generate_coord_moveset(board: Board, from_coord: Coord2D, directions: Coord
                 break
     return move_set
 
-
+# TODO: en passant move
 def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     x, y = from_coord
     piece_to_move: Piece = board[y][x].piece
@@ -99,6 +99,7 @@ def _generate_queen_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
                                    move_range=len(board))
 
 
+# TODO: castling
 def _generate_king_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     x, y = from_coord
     enemy_colour: Colour = Colour.WHITE if board[y][x].colour() == Colour.BLACK else Colour.BLACK
