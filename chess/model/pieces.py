@@ -10,7 +10,7 @@ class Piece:
         return f"Piece(colour={self.colour})"
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__[:2]}{self.colour[0]}"
+        return f"{self.__class__.__name__[:2]}{str(self.colour)[7]}"
 
 
 class Pawn(Piece):
