@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from chess.custom_typehints import Colour, GameStatus
 from chess.model.board import Board
-from chess.model.game_state import GameState
+from chess.model.game import GameState
 from chess.model.player import Player
 
 
