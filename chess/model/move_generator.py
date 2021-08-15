@@ -137,6 +137,7 @@ def generate_move(board: Board, from_coord: Coord2D) -> Coord2DSet:
 def get_attack_coords(board: Board, colour: Colour,
                       exclude_type: Union[Iterable[Piece], Type[Piece]] = None
                       ) -> Coord2DSet:
+    """Generate all valid attack coordinates of a given colour from a board"""
     if exclude_type is None:
         exclude_type = []
 

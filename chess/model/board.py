@@ -59,6 +59,9 @@ class Board:
         """
         self.blocks[to_coord[1]][to_coord[0]].piece = piece
 
+    def get_block_from_tuple(self, from_coord: Coord2D) -> Block:
+        return self.blocks[from_coord[1]][from_coord[0]]
+
     def move_piece(self, from_coord: Coord2D, to_coord: Coord2D) -> None:
         """
         Move a piece from_coord to to_coord on the board. Both 2D coordinates are ordered x,y
@@ -86,6 +89,13 @@ class Board:
         for row in self.blocks:
             for block in row:
                 block.piece = None
+
+    def get_king_location(self, colour: Colour) -> Coord2D:
+        for row in self.blocks:
+            for block in row:
+                if block.piece is not None:
+                    if isinstance(block.piece, King) and block.piece == colour:
+                        return block.x, block.y
 
     def get_pieces_by_colour(self, colour: Colour, exclude_type: Iterable = None) -> Coord2DSet:
         """
