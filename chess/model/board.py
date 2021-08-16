@@ -93,9 +93,9 @@ class Board:
     def get_king_location(self, colour: Colour) -> Coord2D:
         for row in self.blocks:
             for block in row:
-                if block.piece is not None:
-                    if isinstance(block.piece, King) and block.piece == colour:
-                        return block.x, block.y
+                # if block.piece is not None:
+                if isinstance(block.piece, King) and block.colour() is colour:
+                    return block.x, block.y
 
     def get_pieces_by_colour(self, colour: Colour, exclude_type: Iterable = None) -> Coord2DSet:
         """
