@@ -21,7 +21,19 @@ def out_of_bounds(from_coord: Coord2D, bound_range: int) -> bool:
     return False
 
 
-def _generate_coord_moveset(board: Board, from_coord: Coord2D, directions: Coord2DSet, move_range: int) -> Coord2DSet:
+def _generate_coord_moveset(board: Board,
+                            from_coord: Coord2D,
+                            directions: Coord2DSet,
+                            move_range: int
+                            ) -> Coord2DSet:
+    """
+    Helper method for generating move coordinates based on a direction set and move_range given
+    :param board: board to generate moveset from (contains the bounds for the coordinates that can be taken)
+    :param from_coord: location to generate moveset from
+    :param directions: directions the piece can take
+    :param move_range: depicts how many times the directions can be taken
+    :return: possible movements(normal) from the direction and range
+    """
     x, y = from_coord
     piece_to_move: Optional[Piece] = board[y][x].piece
     move_set: Coord2DSet = set()
@@ -133,6 +145,7 @@ def _generate_king_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     return (generated_normal_moves | castle_move) - normal_enemy_moves - enemy_pawn_diag_moves
 
 
+# map piece type to correct generation method
 piece_type_moves: Dict[Type[Piece], Callable[[Board, Coord2D], Coord2DSet]] = {
     Pawn: _generate_pawn_moves,
     Rook: _generate_rook_moves,
@@ -174,7 +187,14 @@ def get_attack_coords(board: Board, colour: Colour,
 
 
 def _get_pawn_diag_attack(board: Board, colour: Colour) -> Coord2DSet:
-    """Helper function for """
+    """
+    Helper function for generating diagonal pawn pseudo-moves of the passed
+    colour, which are moves that can only be taken on a special case. A pawn
+    diagonal move is only valid if there is an enemy piece on the destination block.
+    :param board: board state to generate pawn diagonal movements from
+    :param colour: colour of the pawns
+    :return: coordinate diagonal to all possible diagonal destinations of all pawns for a colour
+    """
     pawn_dir: Coord2DSet = BLACK_PAWN_ATTACK_DIRECTIONS if colour == Colour.BLACK else WHITE_PAWN_ATTACK_DIRECTIONS
 
     move_set: List[Coord2DSet] = []
