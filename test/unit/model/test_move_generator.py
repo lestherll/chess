@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from chess.custom_typehints import Coord2DSet, Colour
+from chess.custom_typehints import Coord2DSet, Colour, Coord2D
 from chess.model.game import Game
 from chess.model.board import Board
 from chess.model.move_generator import generate_move
@@ -289,6 +289,8 @@ class TestMoveValidator(TestCase):
     def test_king_castling(self):
         # test will fail if board column length is less than 5
         # behaviour is undefined for column length greater than 8
+        # only tests for instances where there are no pieces
+        # between the rook and the king
         board: Board = Board()
         board.put_piece((4, 7), King(Colour.WHITE))
         board.put_piece((0, 7), Rook(Colour.WHITE))
@@ -296,15 +298,57 @@ class TestMoveValidator(TestCase):
         king_moveset: Coord2DSet = generate_move(board=board, from_coord=(4, 7))
         self.assertIn((2, 7), king_moveset)
 
+        # king can castle when piece at the other side
+        # is rook and is of the same colour as king
         board.put_piece((7, 7), Rook(Colour.WHITE))
         king_moveset: Coord2DSet = generate_move(board=board, from_coord=(4, 7))
         self.assertIn((6, 7), king_moveset)
 
+        # cannot castle when colour is not the same
         board[7][7].piece.colour = Colour.BLACK
         king_moveset: Coord2DSet = generate_move(board=board, from_coord=(4, 7))
         self.assertNotIn((6, 7), king_moveset)
 
+        # can castle again when the colour is the same
         board[7][4].piece.colour = Colour.BLACK
         king_moveset: Coord2DSet = generate_move(board=board, from_coord=(4, 7))
         self.assertIn((6, 7), king_moveset)
 
+        # cannot castle again when the piece at the other side
+        # is not a rook and is not the same colour as King
+        board[7][7].piece = Bishop(Colour.BLACK)
+        king_moveset: Coord2DSet = generate_move(board=board, from_coord=(4, 7))
+        self.assertNotIn((6, 7), king_moveset)
+
+    def test_king_castling_blocked(self):
+        game: Game = Game()
+        board: Board = game.board
+        king_coord: Coord2D = board.get_king_location(Colour.BLACK)
+        king_moveset: Coord2DSet = generate_move(board=board, from_coord=king_coord)
+
+        # castling destinations
+        left_castle: Coord2D = (king_coord[0]-2, king_coord[1])
+        right_castle: Coord2D = (king_coord[0]+2, king_coord[1])
+        self.assertNotIn(left_castle, king_moveset)
+        self.assertNotIn(right_castle, king_moveset)
+
+        # gradually remove pieces blocking the possible castle moves
+        # remove one piece from both sides of the king
+        board.remove_piece_at((king_coord[0]-1, king_coord[1]))
+        board.remove_piece_at((king_coord[0]+1, king_coord[1]))
+        king_moveset = generate_move(board=board, from_coord=king_coord)
+        self.assertNotIn(left_castle, king_moveset)
+        self.assertNotIn(right_castle, king_moveset)
+
+        # remove one piece from both sides of the king again
+        board.remove_piece_at((king_coord[0] - 2, king_coord[1]))
+        board.remove_piece_at((king_coord[0] + 2, king_coord[1]))
+        king_moveset = generate_move(board=board, from_coord=king_coord)
+
+        self.assertNotIn(left_castle, king_moveset)
+        self.assertIn(right_castle, king_moveset)   # right castle should now be possible
+
+        # remove last piece on left side blocking rook and king
+        board.remove_piece_at((king_coord[0] - 3, king_coord[1]))
+        king_moveset = generate_move(board=board, from_coord=king_coord)
+        self.assertIn(left_castle, king_moveset)   # left castle should now be possible
