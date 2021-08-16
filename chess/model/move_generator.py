@@ -5,7 +5,7 @@ from chess.custom_typehints import Coord2DSet, Coord2D, Colour
 from chess.model.board import Block, Board
 from chess.model.pieces import Piece, Pawn, Rook, Bishop, Queen, King, Knight
 
-from chess. constants import *
+from chess.constants import *
 
 
 def out_of_bounds(from_coord: Coord2D, bound_range: int) -> bool:
@@ -44,6 +44,7 @@ def _generate_coord_moveset(board: Board, from_coord: Coord2D, directions: Coord
                     move_set.add(curr_coord)
                 break
     return move_set
+
 
 # TODO: en passant move
 def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
@@ -99,7 +100,6 @@ def _generate_queen_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
                                    move_range=len(board))
 
 
-# TODO: castling
 def _generate_king_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     x, y = from_coord
     enemy_colour: Colour = Colour.WHITE if board[y][x].colour() == Colour.BLACK else Colour.BLACK
@@ -112,22 +112,25 @@ def _generate_king_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
         # 2. if there is a rook
         # 3. if rook is of same colour with king
         # 4. if the gap between king and rook is empty
-        if all([not board[j][i].piece for i, j in [(x-1, y), (x-2, y), (x-3, y)]]) and \
-                isinstance(board[y][x-4].piece, Rook) and \
-                board[y][x-4].colour() is board[y][x].colour():
-            castle_move.add((x-2, y))
-        if all([not board[j][i].piece for i, j in [(x+1, y), (x+2, y)]]) and \
-                isinstance(board[y][x+3].piece, Rook) and \
-                board[y][x+3].colour() is board[y][x].colour():
-            castle_move.add((x+2, y))
+        if all([not board[j][i].piece for i, j in [(x - 1, y), (x - 2, y), (x - 3, y)]]) and \
+                isinstance(board[y][x - 4].piece, Rook) and \
+                board[y][x - 4].colour() is board[y][x].colour():
+            castle_move.add((x - 2, y))
+        if all([not board[j][i].piece for i, j in [(x + 1, y), (x + 2, y)]]) and \
+                isinstance(board[y][x + 3].piece, Rook) and \
+                board[y][x + 3].colour() is board[y][x].colour():
+            castle_move.add((x + 2, y))
 
-    return _generate_coord_moveset(board=board,
-                                   from_coord=from_coord,
-                                   directions=KING_DIRECTIONS,
-                                   move_range=1) \
-        .union(castle_move)\
-        .difference(get_attack_coords(board=board, colour=enemy_colour, exclude_type=King))\
-        .difference(_get_pawn_diag_attack(board=board, colour=enemy_colour))
+    generated_normal_moves: Coord2DSet = _generate_coord_moveset(board=board,
+                                                                 from_coord=from_coord,
+                                                                 directions=KING_DIRECTIONS,
+                                                                 move_range=1)
+    # generate normal enemy moves
+    normal_enemy_moves: Coord2DSet = get_attack_coords(board=board, colour=enemy_colour, exclude_type=King)
+    # generate enemy pawn diagonal pseudo-moves
+    enemy_pawn_diag_moves: Coord2DSet = _get_pawn_diag_attack(board=board, colour=enemy_colour)
+    # verify that king can't move into places they can get checked
+    return (generated_normal_moves | castle_move) - normal_enemy_moves - enemy_pawn_diag_moves
 
 
 piece_type_moves: Dict[Type[Piece], Callable[[Board, Coord2D], Coord2DSet]] = {
