@@ -103,10 +103,29 @@ def _generate_queen_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
 def _generate_king_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
     x, y = from_coord
     enemy_colour: Colour = Colour.WHITE if board[y][x].colour() == Colour.BLACK else Colour.BLACK
+
+    castle_move: Coord2DSet = set()
+    if len(board) == 8 and not board[y][x].piece.has_moved:
+        # enforce castling only for standard board size
+        # check if:
+        # 1. king has not moved
+        # 2. if there is a rook
+        # 3. if rook is of same colour with king
+        # 4. if the gap between king and rook is empty
+        if all([not board[j][i].piece for i, j in [(x-1, y), (x-2, y), (x-3, y)]]) and \
+                isinstance(board[y][x-4].piece, Rook) and \
+                board[y][x-4].colour() is board[y][x].colour():
+            castle_move.add((x-2, y))
+        if all([not board[j][i].piece for i, j in [(x+1, y), (x+2, y)]]) and \
+                isinstance(board[y][x+3].piece, Rook) and \
+                board[y][x+3].colour() is board[y][x].colour():
+            castle_move.add((x+2, y))
+
     return _generate_coord_moveset(board=board,
                                    from_coord=from_coord,
                                    directions=KING_DIRECTIONS,
-                                   move_range=1)\
+                                   move_range=1) \
+        .union(castle_move)\
         .difference(get_attack_coords(board=board, colour=enemy_colour, exclude_type=King))\
         .difference(_get_pawn_diag_attack(board=board, colour=enemy_colour))
 
