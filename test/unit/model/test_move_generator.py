@@ -285,3 +285,26 @@ class TestMoveValidator(TestCase):
         }
         actual_moveset: Coord2DSet = generate_move(board=board, from_coord=(1, 1))
         self.assertSetEqual(expected_moveset, actual_moveset)
+
+    def test_king_castling(self):
+        # test will fail if board column length is less than 5
+        # behaviour is undefined for column length greater than 8
+        board: Board = Board()
+        board.put_piece((4, 7), King(Colour.WHITE))
+        board.put_piece((0, 7), Rook(Colour.WHITE))
+
+        king_moveset: Coord2DSet = generate_move(board=board, from_coord=(4, 7))
+        self.assertIn((2, 7), king_moveset)
+
+        board.put_piece((7, 7), Rook(Colour.WHITE))
+        king_moveset: Coord2DSet = generate_move(board=board, from_coord=(4, 7))
+        self.assertIn((6, 7), king_moveset)
+
+        board[7][7].piece.colour = Colour.BLACK
+        king_moveset: Coord2DSet = generate_move(board=board, from_coord=(4, 7))
+        self.assertNotIn((6, 7), king_moveset)
+
+        board[7][4].piece.colour = Colour.BLACK
+        king_moveset: Coord2DSet = generate_move(board=board, from_coord=(4, 7))
+        self.assertIn((6, 7), king_moveset)
+
