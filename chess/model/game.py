@@ -15,7 +15,7 @@ def is_in_check(board: Board, colour: Colour) -> bool:
 
 class Game:
 
-    def __init__(self, board: Board = None, *, is_white_turn: bool = True) -> None:
+    def __init__(self, board: Board = None, is_white_turn: bool = True) -> None:
         if not board:
             self.board: Board = Board()
         self.black_player: Player = Player("BLACK", Colour.BLACK)
@@ -43,7 +43,7 @@ class Game:
         self.board.put_piece((4, 0), King(Colour.BLACK))
         self.board.put_piece((4, 7), King(Colour.WHITE))
 
-    def turn(self) -> bool:
+    def turn(self) -> Colour:
         return Colour.WHITE if self._is_white_turn else Colour.BLACK
 
     def _enemy(self) -> Colour:

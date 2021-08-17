@@ -59,7 +59,7 @@ def _generate_coord_moveset(board: Board,
 
 
 # TODO: en passant move
-def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
+def _generate_pawn_moves(board: Board, from_coord: Coord2D, last_move: Tuple[Coord2D, Coord2D] = tuple()) -> Coord2DSet:
     x, y = from_coord
     piece_to_move: Piece = board[y][x].piece
     move_range: int = 1 if piece_to_move.has_moved else 2
@@ -78,10 +78,39 @@ def _generate_pawn_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
             if curr_block.piece and curr_block.piece.colour != piece_to_move.colour:
                 move_set.add(curr_coord)
 
+    if len(last_move) == 2 and all([len(coord) == 2 for coord in last_move]):
+        move_set.add(_en_passant_move(board, from_coord, last_move))
+
     return move_set.union(_generate_coord_moveset(board=board,
                                                   from_coord=from_coord,
                                                   directions=directions,
                                                   move_range=move_range))
+
+
+def _en_passant_move(board: Board,
+                     from_coord: Coord2D,
+                     last_move: Tuple[Coord2D, Coord2D]
+                     ) -> Union[Coord2D, Tuple[()]]:
+    """
+    Generate move for an en passant move for a pawn piece if valid
+    """
+    x, y = from_coord
+    piece_to_move: Piece = board[y][x].piece
+
+    # en passant is only possible on this row based on colour
+    row_to_move: int = 4 if piece_to_move.colour is Colour.BLACK else 3
+    column_diff: int = x - last_move[0][0]
+    jumped_two: bool = True if abs(last_move[0][1]-last_move[1][1]) == 2 else False
+
+    # if the difference in y of the last move is 2 then en passant is possible
+    # only if the pawn piece to move is 1 column away from the last moved piece
+    # from either side and is in the correct row(4 for black, 3 for white in terms)
+    # of list index
+    if y != row_to_move or column_diff != 2 or not jumped_two:
+        return tuple()
+    else:
+        y_dir: int = 1 if piece_to_move.colour is Colour.BLACK else -1
+        return last_move[0][0], y + y_dir
 
 
 def _generate_rook_moves(board: Board, from_coord: Coord2D) -> Coord2DSet:
