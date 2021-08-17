@@ -354,7 +354,7 @@ class TestMoveValidator(TestCase):
         king_moveset = generate_move(board=board, from_coord=king_coord)
         self.assertIn(left_castle, king_moveset)   # left castle should now be possible
 
-    def test_en_passant_white(self):
+    def test_en_passant_white_target(self):
         board: Board = Board()
         board.put_piece((1, 4), Pawn(Colour.BLACK))
         board.put_piece((2, 4), Pawn(Colour.WHITE))
@@ -363,3 +363,17 @@ class TestMoveValidator(TestCase):
         # 2,5 must be in moveset
         pawn_moveset: Coord2DSet = generate_move(board=board, from_coord=(1, 4), last_move=last_move)
         self.assertIn((2, 5), pawn_moveset)
+
+        board.put_piece((0, 4), Pawn(Colour.WHITE))
+        last_move = ((0, 6), (0, 4))
+        pawn_moveset = generate_move(board=board, from_coord=(1, 4), last_move=last_move)
+        self.assertIn((0, 5), pawn_moveset)
+
+    def test_en_passant_black_target(self):
+        board: Board = Board()
+        board.put_piece((0, 3), Pawn(Colour.WHITE))
+        board.put_piece((1, 3), Pawn(Colour.BLACK))
+
+        last_move: Tuple[Coord2D, Coord2D] = ((1, 1), (1, 3))
+        pawn_moveset: Coord2DSet = generate_move(board=board, from_coord=(0, 3), last_move=last_move)
+        self.assertIn((1, 2), pawn_moveset)
