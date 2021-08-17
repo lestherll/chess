@@ -99,14 +99,18 @@ def _en_passant_move(board: Board,
 
     # en passant is only possible on this row based on colour
     row_to_move: int = 4 if piece_to_move.colour is Colour.BLACK else 3
-    column_diff: int = x - last_move[0][0]
+    column_diff: int = abs(x - last_move[0][0])
     jumped_two: bool = True if abs(last_move[0][1]-last_move[1][1]) == 2 else False
 
     # if the difference in y of the last move is 2 then en passant is possible
     # only if the pawn piece to move is 1 column away from the last moved piece
     # from either side and is in the correct row(4 for black, 3 for white in terms)
     # of list index
-    if y != row_to_move or column_diff != 2 or not jumped_two:
+    last_move_x, last_move_y = last_move[1]
+    if (y != row_to_move or column_diff != 1 or not jumped_two) or\
+            board[last_move_y][last_move_x].colour() is piece_to_move.colour or\
+            not isinstance(board[last_move_y][last_move_x].piece, Pawn) or\
+            not isinstance(board[y][x].piece, Pawn):
         return tuple()
     else:
         y_dir: int = 1 if piece_to_move.colour is Colour.BLACK else -1
@@ -185,7 +189,7 @@ piece_type_moves: Dict[Type[Piece], Callable[[Board, Coord2D], Coord2DSet]] = {
 }
 
 
-def generate_move(board: Board, from_coord: Coord2D) -> Coord2DSet:
+def generate_move(board: Board, from_coord: Coord2D, last_move: Tuple[Coord2D, Coord2D] = tuple()) -> Coord2DSet:
     """Generate moveset(of Coord2DSet annotation) for a piece on the board"""
     x, y = from_coord
     piece_to_move: Optional[Piece] = board[y][x].piece
@@ -193,7 +197,11 @@ def generate_move(board: Board, from_coord: Coord2D) -> Coord2DSet:
     if piece_to_move is None:
         return set()
 
-    move_set: Coord2DSet = piece_type_moves[piece_to_move.__class__](board, from_coord)
+    piece_type: Type[Piece] = type(piece_to_move)
+    if piece_type is not Pawn:
+        move_set: Coord2DSet = piece_type_moves[piece_type](board, from_coord)
+    else:
+        move_set: Coord2DSet = piece_type_moves[piece_type](board, from_coord, last_move=last_move)
 
     return move_set
 

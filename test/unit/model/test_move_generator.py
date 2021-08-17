@@ -1,3 +1,4 @@
+from typing import Tuple
 from unittest import TestCase
 
 from chess.custom_typehints import Coord2DSet, Colour, Coord2D
@@ -352,3 +353,13 @@ class TestMoveValidator(TestCase):
         board.remove_piece_at((king_coord[0] - 3, king_coord[1]))
         king_moveset = generate_move(board=board, from_coord=king_coord)
         self.assertIn(left_castle, king_moveset)   # left castle should now be possible
+
+    def test_en_passant_white(self):
+        board: Board = Board()
+        board.put_piece((1, 4), Pawn(Colour.BLACK))
+        board.put_piece((2, 4), Pawn(Colour.WHITE))
+
+        last_move: Tuple[Coord2D, Coord2D] = ((2, 6), (2, 4))
+        # 2,5 must be in moveset
+        pawn_moveset: Coord2DSet = generate_move(board=board, from_coord=(1, 4), last_move=last_move)
+        self.assertIn((2, 5), pawn_moveset)
