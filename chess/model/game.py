@@ -52,6 +52,7 @@ class Game:
     # TODO: pieces can block check paths from enemy
     # TODO: when in check, player can only move king or block the check
     # TODO: rook pair also moves when the king castles
+    # TODO: pieces can be consumed  and must be put somewhere
     def move(self, from_coord: Coord2D, to_coord: Coord2D) -> None:
         block: Block = self.board.get_block_from_tuple(from_coord)
         if block.piece is None:
