@@ -79,3 +79,10 @@ class Game:
 
                 self._is_white_turn = not self._is_white_turn
 
+    def run(self):
+        while self.status not in (GameStatus.BLACK_WIN, GameStatus.WHITE_WIN, GameStatus.DRAW):
+            print(self.board)
+            from_move = input(f"Enter {self.turn()!s} piece to move: ").split()
+            to_move = input(f"Enter destination: ").split()
+
+            self.move(tuple(map(int, from_move)), tuple(map(int, to_move)))

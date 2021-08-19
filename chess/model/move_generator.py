@@ -58,7 +58,6 @@ def _generate_coord_moveset(board: Board,
     return move_set
 
 
-# TODO: en passant move
 def _generate_pawn_moves(board: Board, from_coord: Coord2D, last_move: Tuple[Coord2D, Coord2D] = tuple()) -> Coord2DSet:
     x, y = from_coord
     piece_to_move: Piece = board[y][x].piece
