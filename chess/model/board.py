@@ -47,9 +47,9 @@ class Board:
         board: List = [None for i in range(9)]
         for i, row in enumerate(self.blocks):
             # board[i] = " ".join([str(p) for p in row])
-            board[i+1] = " ".join(map(lambda p: f"{str(p):5}" if p is not None else ".", [i] + row))
+            board[i+1] = " ".join(map(lambda p: f"{str(p):4}" if isinstance(p, int) or p.piece is not None else " .  ", [i] + row))
 
-        board[0] = "   " + " ".join([f"{i:>5}" for i in range(8)])
+        board[0] = "   " + " ".join([f"{i:>4}" for i in range(8)])
 
         return "\n".join(board)
 
