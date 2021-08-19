@@ -328,15 +328,15 @@ class TestMoveValidator(TestCase):
         king_moveset: Coord2DSet = generate_move(board=board, from_coord=king_coord)
 
         # castling destinations
-        left_castle: Coord2D = (king_coord[0]-2, king_coord[1])
-        right_castle: Coord2D = (king_coord[0]+2, king_coord[1])
+        left_castle: Coord2D = (king_coord[0] - 2, king_coord[1])
+        right_castle: Coord2D = (king_coord[0] + 2, king_coord[1])
         self.assertNotIn(left_castle, king_moveset)
         self.assertNotIn(right_castle, king_moveset)
 
         # gradually remove pieces blocking the possible castle moves
         # remove one piece from both sides of the king
-        board.remove_piece_at((king_coord[0]-1, king_coord[1]))
-        board.remove_piece_at((king_coord[0]+1, king_coord[1]))
+        board.remove_piece_at((king_coord[0] - 1, king_coord[1]))
+        board.remove_piece_at((king_coord[0] + 1, king_coord[1]))
         king_moveset = generate_move(board=board, from_coord=king_coord)
         self.assertNotIn(left_castle, king_moveset)
         self.assertNotIn(right_castle, king_moveset)
@@ -347,12 +347,12 @@ class TestMoveValidator(TestCase):
         king_moveset = generate_move(board=board, from_coord=king_coord)
 
         self.assertNotIn(left_castle, king_moveset)
-        self.assertIn(right_castle, king_moveset)   # right castle should now be possible
+        self.assertIn(right_castle, king_moveset)  # right castle should now be possible
 
         # remove last piece on left side blocking rook and king
         board.remove_piece_at((king_coord[0] - 3, king_coord[1]))
         king_moveset = generate_move(board=board, from_coord=king_coord)
-        self.assertIn(left_castle, king_moveset)   # left castle should now be possible
+        self.assertIn(left_castle, king_moveset)  # left castle should now be possible
 
     def test_en_passant_white_target(self):
         board: Board = Board()

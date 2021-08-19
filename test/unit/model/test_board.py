@@ -40,4 +40,3 @@ class TestBoard(TestCase):
         for row in board:
             for block in row:
                 self.assertIsNone(block.piece)
-

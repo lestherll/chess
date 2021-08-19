@@ -47,17 +47,7 @@ piece_notation = {
     Piece: ""
 }
 
+
 def to_piece_notation(piece: Piece) -> str:
     notation: str = piece_notation[type(piece)]
     return notation if piece.colour is Colour.WHITE else notation.lower()
-
-
-
-
-
-
-
-
-
-
-

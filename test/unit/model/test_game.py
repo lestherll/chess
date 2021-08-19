@@ -20,4 +20,3 @@ class TestGame(TestCase):
         self.assertIs(Colour.BLACK, game.turn())
         self.assertTupleEqual(((0, 6), (0, 5)), game.moves_made[0])
         self.assertEqual(2, game.turn_number)
-

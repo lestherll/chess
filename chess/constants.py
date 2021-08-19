@@ -1,6 +1,5 @@
 from chess.custom_typehints import Coord2DSet
 
-
 BLACK_PAWN_DIRECTIONS: Coord2DSet = {(0, 1)}
 BLACK_PAWN_ATTACK_DIRECTIONS: Coord2DSet = {(-1, 1), (1, 1)}
 WHITE_PAWN_DIRECTIONS: Coord2DSet = {(0, -1)}

@@ -43,23 +43,13 @@ class Board:
     def __repr__(self) -> str:
         return f"Board(blocks={self.blocks})"
 
-    # def __str__(self) -> str:
-    #     board: List = [None for i in range(9)]
-    #     for i, row in enumerate(self.blocks):
-    #         # board[i] = " ".join([str(p) for p in row])
-    #         board[i+1] = " ".join(map(lambda p: f"{str(p):4}" if isinstance(p, int) or p.piece is not None else " .  ", [i] + row))
-    #
-    #     board[0] = "   " + " ".join([f"{i:>4}" for i in range(8)])
-    #
-    #     return "\n".join(board)
-
-    # for file rank system later
     def __str__(self) -> str:
         board: List = [None for i in range(9)]
         file = "abcdefgh"
         for i, row in enumerate(self.blocks):
             # board[i] = " ".join([str(p) for p in row])
-            board[i+1] = "".join(map(lambda p: f"{str(p):3}" if isinstance(p, int) or p.piece is not None else ".. ", [8-i] + row))
+            board[i + 1] = "".join(
+                map(lambda p: f"{str(p):3}" if isinstance(p, int) or p.piece is not None else ".. ", [8 - i] + row))
 
         board[0] = " " + "".join([f"{str(i):>3}" for i in file])
 
@@ -137,12 +127,14 @@ class Board:
         :return: None
         """
         length = len(self.blocks)
-        for j in range(length//2):
-            for b0, b1 in zip(self.blocks[j], self.blocks[length-j-1]):
+        for j in range(length // 2):
+            for b0, b1 in zip(self.blocks[j], self.blocks[length - j - 1]):
                 b0.piece, b1.piece = b1.piece, b0.piece
         # print(self.blocks)
 
 
+letters = {letter: i for i, letter in enumerate("abcdefgh")}
+
+
 def letter_to_coord(letter: str) -> Coord2D:
-    letters = {letter: i for i, letter in enumerate("abcdefgh")}
     return letters[letter[0]], 7 - int(letter[1]) + 1

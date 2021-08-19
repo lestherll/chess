@@ -99,16 +99,16 @@ def _en_passant_move(board: Board,
     # en passant is only possible on this row based on colour
     row_to_move: int = 4 if piece_to_move.colour is Colour.BLACK else 3
     column_diff: int = abs(x - last_move[0][0])
-    jumped_two: bool = True if abs(last_move[0][1]-last_move[1][1]) == 2 else False
+    jumped_two: bool = True if abs(last_move[0][1] - last_move[1][1]) == 2 else False
 
     # if the difference in y of the last move is 2 then en passant is possible
     # only if the pawn piece to move is 1 column away from the last moved piece
     # from either side and is in the correct row(4 for black, 3 for white in terms)
     # of list index
     last_move_x, last_move_y = last_move[1]
-    if (y != row_to_move or column_diff != 1 or not jumped_two) or\
-            board[last_move_y][last_move_x].colour() is piece_to_move.colour or\
-            not isinstance(board[last_move_y][last_move_x].piece, Pawn) or\
+    if (y != row_to_move or column_diff != 1 or not jumped_two) or \
+            board[last_move_y][last_move_x].colour() is piece_to_move.colour or \
+            not isinstance(board[last_move_y][last_move_x].piece, Pawn) or \
             not isinstance(board[y][x].piece, Pawn):
         return tuple()
     else:

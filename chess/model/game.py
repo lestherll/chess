@@ -33,9 +33,9 @@ class Game:
 
         for i, piece in enumerate([Rook, Knight, Bishop]):
             self.board.put_piece((i, 0), piece(Colour.BLACK))
-            self.board.put_piece((7-i, 0), piece(Colour.BLACK))
+            self.board.put_piece((7 - i, 0), piece(Colour.BLACK))
             self.board.put_piece((i, 7), piece(Colour.WHITE))
-            self.board.put_piece((7-i, 7), piece(Colour.WHITE))
+            self.board.put_piece((7 - i, 7), piece(Colour.WHITE))
 
         self.board.put_piece((3, 0), Queen(Colour.BLACK))
         self.board.put_piece((3, 7), Queen(Colour.WHITE))
@@ -70,7 +70,8 @@ class Game:
                 # TODO: win states
                 if is_in_check(self.board, self._enemy()):
                     current: Colour = self.turn()
-                    self.status = GameStatus.WHITE_CHECKS_BLACK if current is Colour.WHITE \
+                    self.status = GameStatus.WHITE_CHECKS_BLACK \
+                        if current is Colour.WHITE \
                         else GameStatus.BLACK_CHECKS_WHITE
                     # if not generate_move(board=self.board, from_coord=self.board.get_king_location(self._enemy())):
                     #     self.status = GameStatus.WHITE_WIN if current is Colour.WHITE else GameStatus.BLACK_WIN
