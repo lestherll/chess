@@ -1,7 +1,7 @@
 from typing import Tuple, Set, List
 
 from chess.custom_typehints import Colour, GameStatus, Coord2D, Coord2DSet
-from chess.model.board import Board, Block
+from chess.model.board import Board, Block, letter_to_coord
 from chess.model.move_generator import generate_move, get_attack_coords
 from chess.model.pieces import Pawn, Rook, Knight, Bishop, Queen, King
 from chess.model.player import Player
@@ -82,7 +82,8 @@ class Game:
     def run(self):
         while self.status not in (GameStatus.BLACK_WIN, GameStatus.WHITE_WIN, GameStatus.DRAW):
             print(self.board)
-            from_move = input(f"Enter {self.turn()!s} piece to move: ").split()
-            to_move = input(f"Enter destination: ").split()
+            from_move = input(f"Enter {self.turn()!s} piece to move: ")
+            to_move = input(f"Enter destination: ")
 
-            self.move(tuple(map(int, from_move)), tuple(map(int, to_move)))
+            # self.move(tuple(map(int, from_move)), tuple(map(int, to_move)))
+            self.move(letter_to_coord(from_move), letter_to_coord(to_move))
