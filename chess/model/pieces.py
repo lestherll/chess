@@ -13,6 +13,7 @@ class Piece:
         return f"{to_piece_notation(self)}"
 
 
+# TODO: Promotion to other piece types
 class Pawn(Piece):
     pass
 

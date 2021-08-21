@@ -47,14 +47,18 @@ class Game:
         return Colour.WHITE if self._is_white_turn else Colour.BLACK
 
     def _enemy(self) -> Colour:
+        """Colour variant of the current player's enemy"""
         return Colour.BLACK if self._is_white_turn else Colour.WHITE
 
-    # TODO: pieces can block check paths from enemy
+    # TODO: pieces can block check paths from enemy and consume them if possible
     # TODO: when in check, player can only move king or block the check
     # TODO: rook pair also moves when the king castles
     # TODO: pieces can be consumed  and must be put somewhere
     def move(self, from_coord: Coord2D, to_coord: Coord2D) -> None:
+
         block: Block = self.board.get_block_from_tuple(from_coord)
+        current_mover: Colour = self.turn()
+
         if block.piece is None:
             print(f"there's no piece at {from_coord}")
         elif block.piece.colour != self.turn():
@@ -69,18 +73,24 @@ class Game:
                 # TODO: draw states
                 # TODO: win states
                 if is_in_check(self.board, self._enemy()):
-                    current: Colour = self.turn()
-                    self.status = GameStatus.WHITE_CHECKS_BLACK \
-                        if current is Colour.WHITE \
-                        else GameStatus.BLACK_CHECKS_WHITE
-                    # if not generate_move(board=self.board, from_coord=self.board.get_king_location(self._enemy())):
-                    #     self.status = GameStatus.WHITE_WIN if current is Colour.WHITE else GameStatus.BLACK_WIN
+
+                    # update check status
+                    if current_mover is Colour.WHITE:
+                        self.status = GameStatus.WHITE_CHECKS_BLACK
+                    else:
+                        self.status = GameStatus.BLACK_CHECKS_WHITE
+
+                    # generate move for the enemy king
+                    # pieces cannot block checks yet
+                    if not generate_move(board=self.board, from_coord=self.board.get_king_location(self._enemy())):
+                        self.status = GameStatus.WHITE_WIN if current_mover is Colour.WHITE else GameStatus.BLACK_WIN
                 else:
                     self.status = GameStatus.NORMAL
 
+                block.piece.has_moved = True
                 self._is_white_turn = not self._is_white_turn
 
-    def run(self):
+    def run(self, debug: bool = False):
         while self.status not in (GameStatus.BLACK_WIN, GameStatus.WHITE_WIN, GameStatus.DRAW):
             print(self.board)
             from_move = input(f"Enter {self.turn()!s} piece to move: ")
@@ -88,3 +98,6 @@ class Game:
 
             # self.move(tuple(map(int, from_move)), tuple(map(int, to_move)))
             self.move(letter_to_coord(from_move), letter_to_coord(to_move))
+
+            if debug:
+                print(self.status)
